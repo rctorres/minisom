@@ -7,63 +7,66 @@ from numpy import zeros, ones, array, arange, random, array_equal, linalg, subtr
 from numpy.linalg import norm
 import pickle
 
-class TestMinisom(pytest):
-    def setUp(self):
-        self.som = MiniSom(5, 5, 1)
+class TestMinisom():
+    
+    @pytest.fixture
+    def som(self):
+        ret = MiniSom(5, 5, 1)
         for i in range(5):
             for j in range(5):
                 # checking weights normalization
-                assert_almost_equal(1.0, linalg.norm(self.som._weights[i, j]))
-        self.som._weights = zeros((5, 5, 1))  # fake weights
-        self.som._weights[2, 3] = 5.0
-        self.som._weights[1, 1] = 2.0
+                assert_almost_equal(1.0, linalg.norm(ret._weights[i, j]))
+        ret._weights = zeros((5, 5, 1))  # fake weights
+        ret._weights[2, 3] = 5.0
+        ret._weights[1, 1] = 2.0
+        return ret
 
-    def test_decay_function(self):
-        assert self.som._decay_function(1., 2., 3.) == 1./(1.+2./(3./2))
+    def test_decay_function(self, som):
+        assert som._decay_function(1., 2., 3.) == 1./(1.+2./(3./2))
 
     # def test_fast_norm(self):
     #     assert fast_norm(array([1, 3])) == sqrt(1+9)
 
-    # def test_euclidean_distance(self):
+    # def test_euclidean_distance(self, som):
     #     x = zeros((1, 2))
     #     w = ones((2, 2, 2))
-    #     d = self.som._euclidean_distance(x, w)
+    #     d = som._euclidean_distance(x, w)
     #     assert_array_almost_equal(d, [[1.41421356, 1.41421356],
     #                                   [1.41421356, 1.41421356]])
 
-    # def test_cosine_distance(self):
+    # def test_cosine_distance(self, som):
     #     x = zeros((1, 2))
     #     w = ones((2, 2, 2))
-    #     d = self.som._cosine_distance(x, w)
+    #     d = som._cosine_distance(x, w)
     #     assert_array_almost_equal(d, [[1., 1.],
     #                                   [1., 1.]])
 
-    # def test_manhattan_distance(self):
+    # def test_manhattan_distance(self, som):
     #     x = zeros((1, 2))
     #     w = ones((2, 2, 2))
-    #     d = self.som._manhattan_distance(x, w)
+    #     d = som._manhattan_distance(x, w)
     #     assert_array_almost_equal(d, [[2., 2.],
     #                                   [2., 2.]])
 
-    # def test_chebyshev_distance(self):
+    # def test_chebyshev_distance(self, som):
     #     x = array([1, 3])
     #     w = ones((2, 2, 2))
-    #     d = self.som._chebyshev_distance(x, w)
+    #     d = som._chebyshev_distance(x, w)
     #     assert_array_almost_equal(d, [[2., 2.],
     #                                   [2., 2.]])
 
-    # def test_check_input_len(self):
+    # def test_check_input_len(self, som):
     #     with self.assertRaises(ValueError):
-    #         self.som.train_batch([[1, 2]], 1)
+    #         som.train_batch([[1, 2]], 1)
 
     #     with self.assertRaises(ValueError):
-    #         self.som.random_weights_init(array([[1, 2]]))
+    #         som.random_weights_init(array([[1, 2]]))
 
     #     with self.assertRaises(ValueError):
-    #         self.som._check_input_len(array([[1, 2]]))
+    #         som._check_input_len(array([[1, 2]]))
 
-    #     self.som._check_input_len(array([[1]]))
-    #     self.som._check_input_len([[1]])
+    #     som._check_input_len(array([[1]]))
+    #     som._check_input_len([[1]])
 
     # def test_unavailable_neigh_function(self):
     #     with self.assertRaises(ValueError):
@@ -73,91 +76,91 @@ class TestMinisom(pytest):
     #     with self.assertRaises(ValueError):
     #         MiniSom(5, 5, 1, activation_distance='ridethewave')
 
-    # def test_gaussian(self):
-    #     bell = self.som._gaussian((2, 2), 1)
+    # def test_gaussian(self, som):
+    #     bell = som._gaussian((2, 2), 1)
     #     assert bell.max() == 1.0
     #     assert bell.argmax() == 12  # unravel(12) = (2,2)
 
-    # def test_mexican_hat(self):
-    #     bell = self.som._mexican_hat((2, 2), 1)
+    # def test_mexican_hat(self, som):
+    #     bell = som._mexican_hat((2, 2), 1)
     #     assert bell.max() == 1.0
     #     assert bell.argmax() == 12  # unravel(12) = (2,2)
 
-    # def test_bubble(self):
-    #     bubble = self.som._bubble((2, 2), 1)
+    # def test_bubble(self, som):
+    #     bubble = som._bubble((2, 2), 1)
     #     assert bubble[2, 2] == 1
     #     assert sum(sum(bubble)) == 1
 
-    # def test_triangle(self):
-    #     bubble = self.som._triangle((2, 2), 1)
+    # def test_triangle(self, som):
+    #     bubble = som._triangle((2, 2), 1)
     #     assert bubble[2, 2] == 1
     #     assert sum(sum(bubble)) == 1
 
-    # def test_win_map(self):
-    #     winners = self.som.win_map([[5.0], [2.0]])
+    # def test_win_map(self, som):
+    #     winners = som.win_map([[5.0], [2.0]])
     #     assert winners[(2, 3)][0] == [5.0]
     #     assert winners[(1, 1)][0] == [2.0]
 
-    # def test_win_map_indices(self):
-    #     winners = self.som.win_map([[5.0], [2.0]], return_indices=True)
+    # def test_win_map_indices(self, som):
+    #     winners = som.win_map([[5.0], [2.0]], return_indices=True)
     #     assert winners[(2, 3)] == [0]
     #     assert winners[(1, 1)] == [1]
 
-    # def test_labels_map(self):
-    #     labels_map = self.som.labels_map([[5.0], [2.0]], ['a', 'b'])
+    # def test_labels_map(self, som):
+    #     labels_map = som.labels_map([[5.0], [2.0]], ['a', 'b'])
     #     assert labels_map[(2, 3)]['a'] == 1
     #     assert labels_map[(1, 1)]['b'] == 1
     #     with self.assertRaises(ValueError):
-    #         self.som.labels_map([[5.0]], ['a', 'b'])
+    #         som.labels_map([[5.0]], ['a', 'b'])
 
-    # def test_activation_reponse(self):
-    #     response = self.som.activation_response([[5.0], [2.0]])
+    # def test_activation_reponse(self, som):
+    #     response = som.activation_response([[5.0], [2.0]])
     #     assert response[2, 3] == 1
     #     assert response[1, 1] == 1
 
-    # def test_activate(self):
-    #     assert self.som.activate(5.0).argmin() == 13.0  # unravel(13) = (2,3)
+    # def test_activate(self, som):
+    #     assert som.activate(5.0).argmin() == 13.0  # unravel(13) = (2,3)
 
-    # def test_distance_from_weights(self):
+    # def test_distance_from_weights(self, som):
     #     data = arange(-5, 5).reshape(-1, 1)
-    #     weights = self.som._weights.reshape(-1, self.som._weights.shape[2])
-    #     distances = self.som._distance_from_weights(data)
+    #     weights = som._weights.reshape(-1, som._weights.shape[2])
+    #     distances = som._distance_from_weights(data)
     #     for i in range(len(data)):
     #         for j in range(len(weights)):
     #             assert (distances[i][j] == norm(data[i] - weights[j]))
 
-    # def test_quantization_error(self):
-    #     assert self.som.quantization_error([[5], [2]]) == 0.0
-    #     assert self.som.quantization_error([[4], [1]]) == 1.0
+    # def test_quantization_error(self, som):
+    #     assert som.quantization_error([[5], [2]]) == 0.0
+    #     assert som.quantization_error([[4], [1]]) == 1.0
 
-    # def test_topographic_error(self):
+    # def test_topographic_error(self, som):
     #     # 5 will have bmu_1 in (2,3) and bmu_2 in (2, 4)
     #     # which are in the same neighborhood
-    #     self.som._weights[2, 4] = 6.0
+    #     som._weights[2, 4] = 6.0
     #     # 15 will have bmu_1 in (4, 4) and bmu_2 in (0, 0)
     #     # which are not in the same neighborhood
-    #     self.som._weights[4, 4] = 15.0
-    #     self.som._weights[0, 0] = 14.
-    #     assert self.som.topographic_error([[5]]) == 0.0
-    #     assert self.som.topographic_error([[15]]) == 1.0
+    #     som._weights[4, 4] = 15.0
+    #     som._weights[0, 0] = 14.
+    #     assert som.topographic_error([[5]]) == 0.0
+    #     assert som.topographic_error([[15]]) == 1.0
 
-    #     self.som.topology = 'hexagonal'
+    #     som.topology = 'hexagonal'
     #     # 10 will have bmu_1 in (0, 4) and bmu_2 in (1, 3)
     #     # which are in the same neighborhood on a hexagonal grid
-    #     self.som._weights[0, 4] = 10.0
-    #     self.som._weights[1, 3] = 9.0
+    #     som._weights[0, 4] = 10.0
+    #     som._weights[1, 3] = 9.0
     #     # 3 will have bmu_1 in (2, 0) and bmu_2 in (1, 1)
     #     # which are in the same neighborhood on a hexagonal grid
-    #     self.som._weights[2, 0] = 3.0
-    #     assert self.som.topographic_error([[10]]) == 0.0
-    #     assert self.som.topographic_error([[3]]) == 0.0
+    #     som._weights[2, 0] = 3.0
+    #     assert som.topographic_error([[10]]) == 0.0
+    #     assert som.topographic_error([[3]]) == 0.0
     #     # True for both hexagonal and rectangular grids
-    #     assert self.som.topographic_error([[5]]) == 0.0
-    #     assert self.som.topographic_error([[15]]) == 1.0
-    #     self.som.topology = 'rectangular'
+    #     assert som.topographic_error([[5]]) == 0.0
+    #     assert som.topographic_error([[15]]) == 1.0
+    #     som.topology = 'rectangular'
 
-    # def test_quantization(self):
-    #     q = self.som.quantization(array([[4], [2]]))
+    # def test_quantization(self, som):
+    #     q = som.quantization(array([[4], [2]]))
     #     assert q[0] == 5.0
     #     assert q[1] == 2.0
 
@@ -262,9 +265,9 @@ class TestMinisom(pytest):
     #     with self.assertRaises(ValueError):
     #         som.distance_map(scaling='puppies')
 
-    # def test_pickling(self):
+    # def test_pickling(self, som):
     #     with open('som.p', 'wb') as outfile:
-    #         pickle.dump(self.som, outfile)
+    #         pickle.dump(som, outfile)
     #     with open('som.p', 'rb') as infile:
     #         pickle.load(infile)
     #     os.remove('som.p')
