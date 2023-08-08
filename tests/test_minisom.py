@@ -1,12 +1,11 @@
-import pytest
 import os
-import numpy as np
-from minisom import MiniSom, _build_iteration_indexes, fast_norm
-from numpy.testing import assert_almost_equal, assert_array_almost_equal
-from numpy.testing import assert_array_equal
-from numpy import array_equal, linalg, subtract, sqrt, max
-from numpy.linalg import norm
 import pickle
+import pytest
+import numpy as np
+from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
+from minisom import MiniSom, _build_iteration_indexes, fast_norm
+
+
 
 class TestMinisom():
     
@@ -16,7 +15,7 @@ class TestMinisom():
         for i in range(5):
             for j in range(5):
                 # checking weights normalization
-                assert_almost_equal(1.0, linalg.norm(ret._weights[i, j]))
+                assert_almost_equal(1.0, np.linalg.norm(ret._weights[i, j]))
         ret._weights = np.zeros((5, 5, 1))  # fake weights
         ret._weights[2, 3] = 5.0
         ret._weights[1, 1] = 2.0
@@ -26,7 +25,7 @@ class TestMinisom():
         assert som._decay_function(1., 2., 3.) == 1./(1.+2./(3./2))
 
     def test_fast_norm(self):
-        assert fast_norm(np.array([1, 3])) == sqrt(1+9)
+        assert fast_norm(np.array([1, 3])) == np.sqrt(1+9)
 
     def test_euclidean_distance(self, som):
         x = np.zeros((1, 2))
@@ -128,7 +127,7 @@ class TestMinisom():
         distances = som._distance_from_weights(data)
         for i in range(len(data)):
             for j in range(len(weights)):
-                assert (distances[i][j] == norm(data[i] - weights[j]))
+                assert (distances[i][j] == np.linalg.norm(data[i] - weights[j]))
 
     def test_quantization_error(self, som):
         assert som.quantization_error([[5], [2]]) == 0.0
@@ -222,7 +221,7 @@ class TestMinisom():
         first_epoch = iterations[0:len_data]
         for i in range(num_epochs):
             i_epoch = iterations[i*len_data:(i+1)*len_data]
-            assert array_equal(first_epoch, i_epoch)
+            assert np.array_equal(first_epoch, i_epoch)
 
         # checks whether the decay_factor stays constant during one epoch
         # and that its values range from 0 to num_epochs-1
@@ -275,7 +274,7 @@ class TestMinisom():
 
     def test_callable_activation_distance(self):
         def euclidean(x, w):
-            return linalg.norm(subtract(x, w), axis=-1)
+            return np.linalg.norm(np.subtract(x, w), axis=-1)
 
         data = np.random.rand(100, 2)
         som1 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5,
