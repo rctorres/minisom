@@ -1,9 +1,10 @@
 import pytest
 import os
+import numpy as np
 from minisom import MiniSom, _build_iteration_indexes, fast_norm
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from numpy.testing import assert_array_equal
-from numpy import zeros, ones, array, arange, random, array_equal, linalg, subtract, sqrt
+from numpy import zeros, ones, array, arange, random, array_equal, linalg, subtract, sqrt, max
 from numpy.linalg import norm
 import pickle
 
@@ -260,7 +261,7 @@ class TestMinisom():
         som = MiniSom(3, 3, 1, random_seed=1)
         som._weights = array([[1, 0, 1], [0, 1, 0], [1, 0, 1]])
         dist = array([[2/3, 3/5, 2/3], [3/5, 4/8, 3/5], [2/3, 3/5, 2/3]])
-        assert_array_equal(som.distance_map(scaling='mean'), dist/max(dist))
+        assert_array_equal(som.distance_map(scaling='mean'), dist/np.max(dist))
 
         with pytest.raises(ValueError):
             som.distance_map(scaling='puppies')
