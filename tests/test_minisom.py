@@ -4,7 +4,7 @@ import numpy as np
 from minisom import MiniSom, _build_iteration_indexes, fast_norm
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from numpy.testing import assert_array_equal
-from numpy import arange, random, array_equal, linalg, subtract, sqrt, max
+from numpy import array_equal, linalg, subtract, sqrt, max
 from numpy.linalg import norm
 import pickle
 
@@ -123,7 +123,7 @@ class TestMinisom():
         assert som.activate(5.0).argmin() == 13.0  # unravel(13) = (2,3)
 
     def test_distance_from_weights(self, som):
-        data = arange(-5, 5).reshape(-1, 1)
+        data = np.arange(-5, 5).reshape(-1, 1)
         weights = som._weights.reshape(-1, som._weights.shape[2])
         distances = som._distance_from_weights(data)
         for i in range(len(data)):
@@ -170,7 +170,7 @@ class TestMinisom():
         som2 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
         # same initialization
         assert_array_almost_equal(som1._weights, som2._weights)
-        data = random.rand(100, 2)
+        data = np.random.rand(100, 2)
         som1 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
         som1.train_random(data, 10)
         som2 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
@@ -212,7 +212,7 @@ class TestMinisom():
     def test_use_epochs_variables(self):
         len_data = 100000
         num_epochs = 100
-        random_gen = random.RandomState(1)
+        random_gen = np.random.RandomState(1)
         iterations = _build_iteration_indexes(len_data, num_epochs,
                                               random_generator=random_gen,
                                               use_epochs=True)
@@ -277,7 +277,7 @@ class TestMinisom():
         def euclidean(x, w):
             return linalg.norm(subtract(x, w), axis=-1)
 
-        data = random.rand(100, 2)
+        data = np.random.rand(100, 2)
         som1 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5,
                        activation_distance=euclidean, random_seed=1)
         som1.train_random(data, 10)
