@@ -11,7 +11,7 @@ services:
                 USER_GROUP_ID: ${USER_GROUP_ID?err}
         entrypoint: tail -f /dev/null
         volumes:
-            - .:/work
+            - ..:/work
             - ${HOST_SSH_KEYS_DIR?err}:/home/ds/.ssh
         environment:
             PYTHONPATH: /work:${PYTHON_PATH-}

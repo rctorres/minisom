@@ -1,6 +1,6 @@
 {
     "name": "Mini SOM GPU",
-    "dockerComposeFile": ["./docker-compose.yml"],
+    "dockerComposeFile": ["./docker/docker-compose.yml"],
     "service": "main",
     "workspaceFolder": "/work",
     "shutdownAction": "stopCompose",
