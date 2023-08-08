@@ -12,11 +12,6 @@ from datetime import timedelta
 import pickle
 import os
 
-# for unit tests
-from numpy.testing import assert_almost_equal, assert_array_almost_equal
-from numpy.testing import assert_array_equal
-import unittest
-
 """
     Minimalistic implementation of the Self Organizing Maps (SOM).
 """

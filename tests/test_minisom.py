@@ -1,4 +1,11 @@
 import pytest
+import os
+from minisom import MiniSom, _build_iteration_indexes, fast_norm
+from numpy.testing import assert_almost_equal, assert_array_almost_equal
+from numpy.testing import assert_array_equal
+from numpy import zeros, ones, array, arange, random, array_equal, linalg, subtract, sqrt
+from numpy.linalg import norm
+import pickle
 
 class TestMinisom(pytest):
     def setUp(self):
