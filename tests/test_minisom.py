@@ -2,6 +2,7 @@ import os
 import pickle
 import pytest
 import numpy as np
+import torch
 from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
 from minisom import MiniSom, _build_iteration_indexes, fast_norm
 
@@ -16,7 +17,7 @@ class TestMinisom():
             for j in range(5):
                 # checking weights normalization
                 assert_almost_equal(1.0, np.linalg.norm(ret._weights[i, j]))
-        ret._weights = np.zeros((5, 5, 1))  # fake weights
+        ret._weights = torch.zeros((5, 5, 1))  # fake weights
         ret._weights[2, 3] = 5.0
         ret._weights[1, 1] = 2.0
         return ret
@@ -28,29 +29,29 @@ class TestMinisom():
         assert fast_norm(np.array([1, 3])) == np.sqrt(1+9)
 
     def test_euclidean_distance(self, som):
-        x = np.zeros((1, 2))
-        w = np.ones((2, 2, 2))
+        x = torch.zeros((1, 2))
+        w = torch.ones((2, 2, 2))
         d = som._euclidean_distance(x, w)
         assert_array_almost_equal(d, [[1.41421356, 1.41421356],
                                       [1.41421356, 1.41421356]])
 
     def test_cosine_distance(self, som):
-        x = np.zeros((1, 2))
-        w = np.ones((2, 2, 2))
+        x = torch.zeros((1, 2))
+        w = torch.ones((2, 2, 2))
         d = som._cosine_distance(x, w)
         assert_array_almost_equal(d, [[1., 1.],
                                       [1., 1.]])
 
     def test_manhattan_distance(self, som):
-        x = np.zeros((1, 2))
-        w = np.ones((2, 2, 2))
+        x = torch.zeros((1, 2))
+        w = torch.ones((2, 2, 2))
         d = som._manhattan_distance(x, w)
         assert_array_almost_equal(d, [[2., 2.],
                                       [2., 2.]])
 
     def test_chebyshev_distance(self, som):
         x = np.array([1, 3])
-        w = np.ones((2, 2, 2))
+        w = torch.ones((2, 2, 2))
         d = som._chebyshev_distance(x, w)
         assert_array_almost_equal(d, [[2., 2.],
                                       [2., 2.]])
