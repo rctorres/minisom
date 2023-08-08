@@ -56,24 +56,24 @@ class TestMinisom():
                                       [2., 2.]])
 
     def test_check_input_len(self, som):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             som.train_batch([[1, 2]], 1)
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             som.random_weights_init(array([[1, 2]]))
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             som._check_input_len(array([[1, 2]]))
 
         som._check_input_len(array([[1]]))
         som._check_input_len([[1]])
 
     def test_unavailable_neigh_function(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             MiniSom(5, 5, 1, neighborhood_function='boooom')
 
     def test_unavailable_distance_function(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             MiniSom(5, 5, 1, activation_distance='ridethewave')
 
     def test_gaussian(self, som):
@@ -110,7 +110,7 @@ class TestMinisom():
         labels_map = som.labels_map([[5.0], [2.0]], ['a', 'b'])
         assert labels_map[(2, 3)]['a'] == 1
         assert labels_map[(1, 1)]['b'] == 1
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             som.labels_map([[5.0]], ['a', 'b'])
 
     def test_activation_reponse(self, som):
@@ -262,7 +262,7 @@ class TestMinisom():
         dist = array([[2/3, 3/5, 2/3], [3/5, 4/8, 3/5], [2/3, 3/5, 2/3]])
         assert_array_equal(som.distance_map(scaling='mean'), dist/max(dist))
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             som.distance_map(scaling='puppies')
 
     def test_pickling(self, som):
