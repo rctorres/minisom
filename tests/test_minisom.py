@@ -1,4 +1,6 @@
-class TestMinisom(unittest.TestCase):
+import pytest
+
+class TestMinisom(pytest):
     def setUp(self):
         self.som = MiniSom(5, 5, 1)
         for i in range(5):
