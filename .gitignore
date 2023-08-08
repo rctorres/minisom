@@ -44,3 +44,5 @@ nosetests.xml
 examples/.ipynb_checkpoints/
 
 .env
+
+.vscode
