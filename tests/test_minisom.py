@@ -4,7 +4,7 @@ import numpy as np
 from minisom import MiniSom, _build_iteration_indexes, fast_norm
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from numpy.testing import assert_array_equal
-from numpy import zeros, ones, array, arange, random, array_equal, linalg, subtract, sqrt, max
+from numpy import arange, random, array_equal, linalg, subtract, sqrt, max
 from numpy.linalg import norm
 import pickle
 
@@ -17,7 +17,7 @@ class TestMinisom():
             for j in range(5):
                 # checking weights normalization
                 assert_almost_equal(1.0, linalg.norm(ret._weights[i, j]))
-        ret._weights = zeros((5, 5, 1))  # fake weights
+        ret._weights = np.zeros((5, 5, 1))  # fake weights
         ret._weights[2, 3] = 5.0
         ret._weights[1, 1] = 2.0
         return ret
@@ -26,32 +26,32 @@ class TestMinisom():
         assert som._decay_function(1., 2., 3.) == 1./(1.+2./(3./2))
 
     def test_fast_norm(self):
-        assert fast_norm(array([1, 3])) == sqrt(1+9)
+        assert fast_norm(np.array([1, 3])) == sqrt(1+9)
 
     def test_euclidean_distance(self, som):
-        x = zeros((1, 2))
-        w = ones((2, 2, 2))
+        x = np.zeros((1, 2))
+        w = np.ones((2, 2, 2))
         d = som._euclidean_distance(x, w)
         assert_array_almost_equal(d, [[1.41421356, 1.41421356],
                                       [1.41421356, 1.41421356]])
 
     def test_cosine_distance(self, som):
-        x = zeros((1, 2))
-        w = ones((2, 2, 2))
+        x = np.zeros((1, 2))
+        w = np.ones((2, 2, 2))
         d = som._cosine_distance(x, w)
         assert_array_almost_equal(d, [[1., 1.],
                                       [1., 1.]])
 
     def test_manhattan_distance(self, som):
-        x = zeros((1, 2))
-        w = ones((2, 2, 2))
+        x = np.zeros((1, 2))
+        w = np.ones((2, 2, 2))
         d = som._manhattan_distance(x, w)
         assert_array_almost_equal(d, [[2., 2.],
                                       [2., 2.]])
 
     def test_chebyshev_distance(self, som):
-        x = array([1, 3])
-        w = ones((2, 2, 2))
+        x = np.array([1, 3])
+        w = np.ones((2, 2, 2))
         d = som._chebyshev_distance(x, w)
         assert_array_almost_equal(d, [[2., 2.],
                                       [2., 2.]])
@@ -61,12 +61,12 @@ class TestMinisom():
             som.train_batch([[1, 2]], 1)
 
         with pytest.raises(ValueError):
-            som.random_weights_init(array([[1, 2]]))
+            som.random_weights_init(np.array([[1, 2]]))
 
         with pytest.raises(ValueError):
-            som._check_input_len(array([[1, 2]]))
+            som._check_input_len(np.array([[1, 2]]))
 
-        som._check_input_len(array([[1]]))
+        som._check_input_len(np.array([[1]]))
         som._check_input_len([[1]])
 
     def test_unavailable_neigh_function(self):
@@ -161,7 +161,7 @@ class TestMinisom():
         som.topology = 'rectangular'
 
     def test_quantization(self, som):
-        q = som.quantization(array([[4], [2]]))
+        q = som.quantization(np.array([[4], [2]]))
         assert q[0] == 5.0
         assert q[1] == 2.0
 
@@ -180,31 +180,31 @@ class TestMinisom():
 
     def test_train_batch(self):
         som = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
-        data = array([[4, 2], [3, 1]])
+        data = np.array([[4, 2], [3, 1]])
         q1 = som.quantization_error(data)
         som.train(data, 10)
         assert q1 > som.quantization_error(data)
 
-        data = array([[1, 5], [6, 7]])
+        data = np.array([[1, 5], [6, 7]])
         q1 = som.quantization_error(data)
         som.train_batch(data, 10, verbose=True)
         assert q1 > som.quantization_error(data)
 
     def test_train_random(self):
         som = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
-        data = array([[4, 2], [3, 1]])
+        data = np.array([[4, 2], [3, 1]])
         q1 = som.quantization_error(data)
         som.train(data, 10, random_order=True)
         assert q1 > som.quantization_error(data)
 
-        data = array([[1, 5], [6, 7]])
+        data = np.array([[1, 5], [6, 7]])
         q1 = som.quantization_error(data)
         som.train_random(data, 10, verbose=True)
         assert q1 > som.quantization_error(data)
 
     def test_train_use_epochs(self):
         som = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
-        data = array([[4, 2], [3, 1]])
+        data = np.array([[4, 2], [3, 1]])
         q1 = som.quantization_error(data)
         som.train(data, 10, use_epochs=True)
         assert q1 > som.quantization_error(data)
@@ -236,14 +236,14 @@ class TestMinisom():
 
     def test_random_weights_init(self):
         som = MiniSom(2, 2, 2, random_seed=1)
-        som.random_weights_init(array([[1.0, .0]]))
+        som.random_weights_init(np.array([[1.0, .0]]))
         for w in som._weights:
-            assert_array_equal(w[0], array([1.0, .0]))
+            assert_array_equal(w[0], np.array([1.0, .0]))
 
     def test_pca_weights_init(self):
         som = MiniSom(2, 2, 2)
-        som.pca_weights_init(array([[1.,  0.], [0., 1.], [1., 0.], [0., 1.]]))
-        expected = array([[[-1.41421356,  0.],
+        som.pca_weights_init(np.array([[1.,  0.], [0., 1.], [1., 0.], [0., 1.]]))
+        expected = np.array([[[-1.41421356,  0.],
                            [0.,  1.41421356]],
                           [[0., -1.41421356],
                            [1.41421356,  0.]]])
@@ -251,16 +251,16 @@ class TestMinisom():
 
     def test_distance_map(self):
         som = MiniSom(2, 2, 2, random_seed=1)
-        som._weights = array([[[1.,  0.], [0., 1.]], [[1., 0.], [0., 1.]]])
-        assert_array_equal(som.distance_map(), array([[1., 1.], [1., 1.]]))
+        som._weights = np.array([[[1.,  0.], [0., 1.]], [[1., 0.], [0., 1.]]])
+        assert_array_equal(som.distance_map(), np.array([[1., 1.], [1., 1.]]))
 
         som = MiniSom(2, 2, 2, topology='hexagonal', random_seed=1)
-        som._weights = array([[[1.,  0.], [0., 1.]], [[1., 0.], [0., 1.]]])
-        assert_array_equal(som.distance_map(), array([[.5, 1.], [1., .5]]))
+        som._weights = np.array([[[1.,  0.], [0., 1.]], [[1., 0.], [0., 1.]]])
+        assert_array_equal(som.distance_map(), np.array([[.5, 1.], [1., .5]]))
 
         som = MiniSom(3, 3, 1, random_seed=1)
-        som._weights = array([[1, 0, 1], [0, 1, 0], [1, 0, 1]])
-        dist = array([[2/3, 3/5, 2/3], [3/5, 4/8, 3/5], [2/3, 3/5, 2/3]])
+        som._weights = np.array([[1, 0, 1], [0, 1, 0], [1, 0, 1]])
+        dist = np.array([[2/3, 3/5, 2/3], [3/5, 4/8, 3/5], [2/3, 3/5, 2/3]])
         assert_array_equal(som.distance_map(scaling='mean'), dist/np.max(dist))
 
         with pytest.raises(ValueError):
