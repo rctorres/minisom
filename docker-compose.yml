@@ -14,7 +14,7 @@ services:
             - .:/work
             - ${HOST_SSH_KEYS_DIR?err}:/home/ds/.ssh
         environment:
-            PYTHONPATH: /work/src:${PYTHON_PATH-}
+            PYTHONPATH: /work:${PYTHON_PATH-}
 
 
         #Habilitando os drivers da GPU, caso uma esteja presente.
