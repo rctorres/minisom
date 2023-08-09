@@ -2,9 +2,8 @@ import os
 import pickle
 import pytest
 import torch
-from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
+from torch.testing import assert_close
 from minisom import MiniSom, _build_iteration_indexes, fast_norm
-
 
 
 class TestMinisom():
@@ -15,7 +14,7 @@ class TestMinisom():
         for i in range(5):
             for j in range(5):
                 # checking weights normalization
-                assert_almost_equal(1.0, torch.linalg.norm(ret._weights[i, j]))
+                assert_close(1.0, torch.linalg.norm(ret._weights[i, j]))
         ret._weights = torch.zeros((5, 5, 1))  # fake weights
         ret._weights[2, 3] = 5.0
         ret._weights[1, 1] = 2.0
@@ -31,28 +30,28 @@ class TestMinisom():
         x = torch.zeros((1, 2))
         w = torch.ones((2, 2, 2))
         d = som._euclidean_distance(x, w)
-        assert_array_almost_equal(d, [[1.41421356, 1.41421356],
+        assert_close(d, [[1.41421356, 1.41421356],
                                       [1.41421356, 1.41421356]])
 
     def test_cosine_distance(self, som):
         x = torch.zeros((1, 2))
         w = torch.ones((2, 2, 2))
         d = som._cosine_distance(x, w)
-        assert_array_almost_equal(d, [[1., 1.],
+        assert_close(d, [[1., 1.],
                                       [1., 1.]])
 
     def test_manhattan_distance(self, som):
         x = torch.zeros((1, 2))
         w = torch.ones((2, 2, 2))
         d = som._manhattan_distance(x, w)
-        assert_array_almost_equal(d, [[2., 2.],
+        assert_close(d, [[2., 2.],
                                       [2., 2.]])
 
     def test_chebyshev_distance(self, som):
         x = torch.tensor([1, 3])
         w = torch.ones((2, 2, 2))
         d = som._chebyshev_distance(x, w)
-        assert_array_almost_equal(d, [[2., 2.],
+        assert_close(d, [[2., 2.],
                                       [2., 2.]])
 
     def test_check_input_len(self, som):
@@ -168,14 +167,14 @@ class TestMinisom():
         som1 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
         som2 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
         # same initialization
-        assert_array_almost_equal(som1._weights, som2._weights)
+        assert_close(som1._weights, som2._weights)
         data = torch.rand(100, 2)
         som1 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
         som1.train_random(data, 10)
         som2 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
         som2.train_random(data, 10)
         # same state after training
-        assert_array_almost_equal(som1._weights, som2._weights)
+        assert_close(som1._weights, som2._weights)
 
     def test_train_batch(self):
         som = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
@@ -238,7 +237,7 @@ class TestMinisom():
         som = MiniSom(2, 2, 2, random_seed=1)
         som.random_weights_init(torch.tensor([[1.0, .0]]))
         for w in som._weights:
-            assert_array_equal(w[0], torch.tensor([1.0, .0]))
+            assert torch.equal(w[0], torch.tensor([1.0, .0]))
 
     def test_pca_weights_init(self):
         som = MiniSom(2, 2, 2)
@@ -247,21 +246,21 @@ class TestMinisom():
                            [0.,  1.41421356]],
                           [[0., -1.41421356],
                            [1.41421356,  0.]]])
-        assert_array_almost_equal(som._weights, expected)
+        assert_close(som._weights, expected)
 
     def test_distance_map(self):
         som = MiniSom(2, 2, 2, random_seed=1)
         som._weights = torch.tensor([[[1.,  0.], [0., 1.]], [[1., 0.], [0., 1.]]])
-        assert_array_equal(som.distance_map(), torch.tensor([[1., 1.], [1., 1.]]))
+        assert torch.equal(som.distance_map(), torch.tensor([[1., 1.], [1., 1.]]))
 
         som = MiniSom(2, 2, 2, topology='hexagonal', random_seed=1)
         som._weights = torch.tensor([[[1.,  0.], [0., 1.]], [[1., 0.], [0., 1.]]])
-        assert_array_equal(som.distance_map(), torch.tensor([[.5, 1.], [1., .5]]))
+        assert torch.equal(som.distance_map(), torch.tensor([[.5, 1.], [1., .5]]))
 
         som = MiniSom(3, 3, 1, random_seed=1)
         som._weights = torch.tensor([[1, 0, 1], [0, 1, 0], [1, 0, 1]])
         dist = torch.tensor([[2/3, 3/5, 2/3], [3/5, 4/8, 3/5], [2/3, 3/5, 2/3]])
-        assert_array_equal(som.distance_map(scaling='mean'), dist/dist.max())
+        assert torch.equal(som.distance_map(scaling='mean'), dist/dist.max())
 
         with pytest.raises(ValueError):
             som.distance_map(scaling='puppies')
@@ -284,4 +283,4 @@ class TestMinisom():
         som2 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
         som2.train_random(data, 10)
         # same state after training
-        assert_array_almost_equal(som1._weights, som2._weights)
+        assert_close(som1._weights, som2._weights)
