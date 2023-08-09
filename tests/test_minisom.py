@@ -261,7 +261,7 @@ class TestMinisom():
         som = MiniSom(3, 3, 1, random_seed=1)
         som._weights = torch.tensor([[1, 0, 1], [0, 1, 0], [1, 0, 1]])
         dist = torch.tensor([[2/3, 3/5, 2/3], [3/5, 4/8, 3/5], [2/3, 3/5, 2/3]])
-        assert_array_equal(som.distance_map(scaling='mean'), dist/np.max(dist))
+        assert_array_equal(som.distance_map(scaling='mean'), dist/dist.max())
 
         with pytest.raises(ValueError):
             som.distance_map(scaling='puppies')
@@ -275,7 +275,7 @@ class TestMinisom():
 
     def test_callable_activation_distance(self):
         def euclidean(x, w):
-            return np.linalg.norm(np.subtract(x, w), axis=-1)
+            return np.linalg.norm(torch.subtract(x, w), axis=-1)
 
         data = torch.rand(100, 2)
         som1 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5,
