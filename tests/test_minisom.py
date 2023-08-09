@@ -1,7 +1,6 @@
 import os
 import pickle
 import pytest
-import numpy as np
 import torch
 from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
 from minisom import MiniSom, _build_iteration_indexes, fast_norm
