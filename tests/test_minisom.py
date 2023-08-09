@@ -16,7 +16,7 @@ class TestMinisom():
         for i in range(5):
             for j in range(5):
                 # checking weights normalization
-                assert_almost_equal(1.0, np.linalg.norm(ret._weights[i, j]))
+                assert_almost_equal(1.0, torch.linalg.norm(ret._weights[i, j]))
         ret._weights = torch.zeros((5, 5, 1))  # fake weights
         ret._weights[2, 3] = 5.0
         ret._weights[1, 1] = 2.0
@@ -128,7 +128,7 @@ class TestMinisom():
         distances = som._distance_from_weights(data)
         for i in range(len(data)):
             for j in range(len(weights)):
-                assert (distances[i][j] == np.linalg.norm(data[i] - weights[j]))
+                assert (distances[i][j] == torch.linalg.norm(data[i] - weights[j]))
 
     def test_quantization_error(self, som):
         assert som.quantization_error([[5], [2]]) == 0.0
@@ -222,7 +222,7 @@ class TestMinisom():
         first_epoch = iterations[0:len_data]
         for i in range(num_epochs):
             i_epoch = iterations[i*len_data:(i+1)*len_data]
-            assert np.array_equal(first_epoch, i_epoch)
+            assert torch.equal(first_epoch, i_epoch)
 
         # checks whether the decay_factor stays constant during one epoch
         # and that its values range from 0 to num_epochs-1
@@ -275,7 +275,7 @@ class TestMinisom():
 
     def test_callable_activation_distance(self):
         def euclidean(x, w):
-            return np.linalg.norm(torch.subtract(x, w), axis=-1)
+            return torch.linalg.norm(torch.subtract(x, w), axis=-1)
 
         data = torch.rand(100, 2)
         som1 = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5,
