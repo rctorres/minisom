@@ -30,29 +30,29 @@ class TestMinisom():
         x = torch.zeros((1, 2))
         w = torch.ones((2, 2, 2))
         d = som._euclidean_distance(x, w)
-        assert_close(d, [[1.41421356, 1.41421356],
-                                      [1.41421356, 1.41421356]])
+        assert_close(d, torch.tensor([[1.41421356, 1.41421356],
+                                      [1.41421356, 1.41421356]]))
 
     def test_cosine_distance(self, som):
         x = torch.zeros((1, 2))
         w = torch.ones((2, 2, 2))
         d = som._cosine_distance(x, w)
-        assert_close(d, [[1., 1.],
-                                      [1., 1.]])
+        assert_close(d, torch.tensor([[1., 1.],
+                                      [1., 1.]]))
 
     def test_manhattan_distance(self, som):
         x = torch.zeros((1, 2))
         w = torch.ones((2, 2, 2))
         d = som._manhattan_distance(x, w)
-        assert_close(d, [[2., 2.],
-                                      [2., 2.]])
+        assert_close(d, torch.tensor([[2., 2.],
+                                      [2., 2.]]))
 
     def test_chebyshev_distance(self, som):
         x = torch.tensor([1, 3])
         w = torch.ones((2, 2, 2))
         d = som._chebyshev_distance(x, w)
-        assert_close(d, [[2., 2.],
-                                      [2., 2.]])
+        assert_close(d, torch.tensor([[2., 2.],
+                                      [2., 2.]]))
 
     def test_check_input_len(self, som):
         with pytest.raises(ValueError):
