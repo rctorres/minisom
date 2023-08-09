@@ -212,7 +212,8 @@ class TestMinisom():
     def test_use_epochs_variables(self):
         len_data = 100000
         num_epochs = 100
-        random_gen = np.random.RandomState(1)
+        random_gen = torch.Generator()
+        random_gen.manual_seed(1)
         iterations = _build_iteration_indexes(len_data, num_epochs,
                                               random_generator=random_gen,
                                               use_epochs=True)
