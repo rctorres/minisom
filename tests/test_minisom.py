@@ -24,7 +24,7 @@ class TestMinisom():
         assert som._decay_function(1., 2., 3.) == 1./(1.+2./(3./2))
 
     def test_fast_norm(self):
-        assert fast_norm(torch.tensor([1, 3])) == torch.sqrt(1+9)
+        assert fast_norm(torch.tensor([1., 3.])) == torch.sqrt(torch.tensor(1.+9.))
 
     def test_euclidean_distance(self, som):
         x = torch.zeros((1, 2))

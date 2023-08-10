@@ -60,10 +60,10 @@ def _wrap_index__in_verbose(iterations: torch.tensor) -> None:
         stdout.write(progress)
 
 
-def fast_norm(x: torch.tensor) -> torch.tensor:
+def fast_norm(x: torch.tensor) -> float:
     """Returns norm-2 of a 1-D numpy array.
     """
-    return sqrt(dot(x, x.T))
+    return torch.sqrt(torch.dot(x, x.T))
 
 
 def asymptotic_decay(learning_rate: float, t: int, max_iter: int) -> float:
