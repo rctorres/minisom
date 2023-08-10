@@ -252,8 +252,8 @@ class MiniSom(object):
     def _gaussian(self, c: int, sigma: float) -> torch.tensor:
         """Returns a Gaussian centered in c."""
         d = 2*sigma*sigma
-        ax = exp(-power(self._xx-self._xx.T[c], 2)/d)
-        ay = exp(-power(self._yy-self._yy.T[c], 2)/d)
+        ax = torch.exp(-torch.pow(self._xx-self._xx.T[c], 2)/d)
+        ay = torch.exp(-torch.pow(self._yy-self._yy.T[c], 2)/d)
         return (ax * ay).T  # the external product gives a matrix
 
     def _mexican_hat(self, c, sigma):
