@@ -1,9 +1,8 @@
-from numpy import (unravel_index, nditer, linalg, subtract, max,
+from numpy import (unravel_index, nditer, max,
                    outer, dot,
                    logical_and, mean, cov, argsort, linspace, transpose,
                    einsum, prod, nan, sqrt, hstack, diff, argmin, multiply,
                    nanmean, nansum)
-from numpy.linalg import norm
 from collections import defaultdict, Counter
 from collections.abc import Callable
 from warnings import warn
@@ -282,17 +281,17 @@ class MiniSom(object):
 
     def _cosine_distance(self, x, w):
         num = (w * x).sum(axis=2)
-        denum = multiply(linalg.norm(w, axis=2), linalg.norm(x))
+        denum = multiply(torch.linalg.norm(w, axis=2), torch.linalg.norm(x))
         return 1 - num / (denum+1e-8)
 
     def _euclidean_distance(self, x, w):
-        return linalg.norm(subtract(x, w), axis=-1)
+        return torch.linalg.norm(torch.subtract(x, w), axis=-1)
 
     def _manhattan_distance(self, x, w):
-        return linalg.norm(subtract(x, w), ord=1, axis=-1)
+        return torch.linalg.norm(torch.subtract(x, w), ord=1, axis=-1)
 
     def _chebyshev_distance(self, x, w):
-        return max(subtract(x, w), axis=-1)
+        return max(torch.subtract(x, w), axis=-1)
 
     def _check_iteration_number(self, num_iteration):
         if num_iteration < 1:
@@ -372,7 +371,7 @@ class MiniSom(object):
             msg = 'PCA initialization inappropriate:' + \
                   'One of the dimensions of the map is 1.'
             warn(msg)
-        pc_length, pc = linalg.eig(cov(transpose(data)))
+        pc_length, pc = torch.linalg.eig(cov(transpose(data)))
         pc_order = argsort(-pc_length)
         for i, c1 in enumerate(linspace(-1, 1, len(self._neigx))):
             for j, c2 in enumerate(linspace(-1, 1, len(self._neigy))):
@@ -534,7 +533,7 @@ class MiniSom(object):
         """Returns the quantization error computed as the average
         distance between each input sample and its best matching unit."""
         self._check_input_len(data)
-        return norm(data-self.quantization(data), axis=1).mean()
+        return torch.linalg.norm(data-self.quantization(data), axis=1).mean()
 
     def topographic_error(self, data):
         """Returns the topographic error computed by finding
@@ -578,7 +577,7 @@ class MiniSom(object):
         b2my_xy = unravel_index(b2mu_inds, self._weights.shape[:2])
         b2mu_x, b2mu_y = b2my_xy[0], b2my_xy[1]
         dxdy = hstack([diff(b2mu_x), diff(b2mu_y)])
-        distance = norm(dxdy, axis=1)
+        distance = torch.linalg.norm(dxdy, axis=1)
         return (distance > t).mean()
 
     def _get_euclidean_coordinates_from_index(self, index):
