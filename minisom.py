@@ -1,4 +1,4 @@
-from numpy import (array, unravel_index, nditer, linalg, subtract, max,
+from numpy import (unravel_index, nditer, linalg, subtract, max,
                    outer, dot,
                    logical_and, mean, cov, argsort, linspace, transpose,
                    einsum, prod, nan, sqrt, hstack, diff, argmin, multiply,
@@ -523,7 +523,7 @@ class MiniSom(object):
         """Returns a matrix d where d[i,j] is the euclidean distance between
         data[i] and the j-th weight.
         """
-        input_data = array(data)
+        input_data = torch.tensor(data)
         weights_flat = self._weights.reshape(-1, self._weights.shape[2])
         input_data_sq = torch.pow(input_data, 2).sum(axis=1, keepdims=True)
         weights_flat_sq = torch.pow(weights_flat, 2).sum(axis=1, keepdims=True)
@@ -563,7 +563,7 @@ class MiniSom(object):
         b2mu_coords = [[self._get_euclidean_coordinates_from_index(bmu[0]),
                         self._get_euclidean_coordinates_from_index(bmu[1])]
                        for bmu in b2mu_inds]
-        b2mu_coords = array(b2mu_coords)
+        b2mu_coords = torch.tensor(b2mu_coords)
         b2mu_neighbors = [(bmu1 >= bmu2-1) & ((bmu1 <= bmu2+1))
                           for bmu1, bmu2 in b2mu_coords]
         b2mu_neighbors = [neighbors.prod() for neighbors in b2mu_neighbors]
