@@ -1,4 +1,4 @@
-from numpy import (unravel_index, nditer, max,
+from numpy import (unravel_index, nditer,
                    outer, dot,
                    logical_and, argsort, linspace, transpose,
                    einsum, prod, nan, hstack, diff, argmin, multiply,
@@ -291,7 +291,7 @@ class MiniSom(object):
         return torch.linalg.norm(torch.subtract(x, w), ord=1, axis=-1)
 
     def _chebyshev_distance(self, x, w):
-        return max(torch.subtract(x, w), axis=-1)
+        return torch.max(torch.subtract(x, w), dim=-1)[0]
 
     def _check_iteration_number(self, num_iteration):
         if num_iteration < 1:
@@ -505,7 +505,7 @@ class MiniSom(object):
         if scaling == 'sum':
             um = nansum(um, axis=2)
 
-        return um/um.max()
+        return um/um.max()[0]
 
     def activation_response(self, data):
         """
