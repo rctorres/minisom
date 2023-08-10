@@ -11,15 +11,16 @@ from time import time
 from datetime import timedelta
 import pickle
 import os
+import torch
 
 """
     Minimalistic implementation of the Self Organizing Maps (SOM).
 """
 
 
-def _build_iteration_indexes(data_len, num_iterations,
-                             verbose=False, random_generator=None,
-                             use_epochs=False):
+def _build_iteration_indexes(data_len: int, num_iterations: int,
+                             verbose: bool=False, random_generator: torch.Generator=None,
+                             use_epochs: bool=False) -> torch.tensor:
     """Returns an iterable with the indexes of the samples
     to pick at each iteration of the training.
 
@@ -41,7 +42,7 @@ def _build_iteration_indexes(data_len, num_iterations,
         return iterations
 
 
-def _wrap_index__in_verbose(iterations):
+def _wrap_index__in_verbose(iterations: torch.tensor) -> None:
     """Yields the values in iterations printing the status on the stdout."""
     m = len(iterations)
     digits = len(str(m))
@@ -60,13 +61,13 @@ def _wrap_index__in_verbose(iterations):
         stdout.write(progress)
 
 
-def fast_norm(x):
+def fast_norm(x: torch.tensor) -> torch.tensor:
     """Returns norm-2 of a 1-D numpy array.
     """
     return sqrt(dot(x, x.T))
 
 
-def asymptotic_decay(learning_rate, t, max_iter):
+def asymptotic_decay(learning_rate: float, t: int, max_iter: int) -> float:
     """Decay function of the learning process.
     Parameters
     ----------
