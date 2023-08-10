@@ -157,26 +157,27 @@ class MiniSom(object):
         if sigma >= x or sigma >= y:
             warn('Warning: sigma is too high for the dimension of the map.')
 
-        self._random_generator = random.RandomState(random_seed)
+        self._random_generator = torch.Generator()
+        self._random_generator.manual_seed(random_seed)
 
         self._learning_rate = learning_rate
         self._sigma = sigma
         self._input_len = input_len
         # random initialization
-        self._weights = self._random_generator.rand(x, y, input_len)*2-1
-        self._weights /= linalg.norm(self._weights, axis=-1, keepdims=True)
+        self._weights = torch.rand(x, y, input_len, generator=self._random_generator)*2-1
+        self._weights /= torch.linalg.norm(self._weights, axis=-1, keepdims=True)
 
-        self._activation_map = zeros((x, y))
-        self._neigx = arange(x)
-        self._neigy = arange(y)  # used to evaluate the neighborhood function
+        self._activation_map = torch.zeros((x, y))
+        self._neigx = torch.arange(x)
+        self._neigy = torch.arange(y)  # used to evaluate the neighborhood function
 
         if topology not in ['hexagonal', 'rectangular']:
             msg = '%s not supported only hexagonal and rectangular available'
             raise ValueError(msg % topology)
         self.topology = topology
-        self._xx, self._yy = meshgrid(self._neigx, self._neigy)
-        self._xx = self._xx.astype(float)
-        self._yy = self._yy.astype(float)
+        self._xx, self._yy = torch.meshgrid(self._neigx, self._neigy, indexing='xy')
+        self._xx = self._xx.float()
+        self._yy = self._yy.float()
         if topology == 'hexagonal':
             self._xx[::-2] -= 0.5
             if neighborhood_function in ['triangle']:
