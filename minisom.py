@@ -1,5 +1,5 @@
 from numpy import (array, unravel_index, nditer, linalg, subtract, max,
-                   power, exp, zeros, outer, dot,
+                   outer, dot,
                    logical_and, mean, cov, argsort, linspace, transpose,
                    einsum, prod, nan, sqrt, hstack, diff, argmin, multiply,
                    nanmean, nansum)
@@ -165,7 +165,7 @@ class MiniSom(object):
         self._weights = torch.rand(x, y, input_len, generator=self._random_generator)*2-1
         self._weights /= torch.linalg.norm(self._weights, axis=-1, keepdims=True)
 
-        self._activation_map = torch.zeros((x, y))
+        self._activation_map = torch.zeros(x, y)
         self._neigx = torch.arange(x)
         self._neigy = torch.arange(y)  # used to evaluate the neighborhood function
 
@@ -258,9 +258,9 @@ class MiniSom(object):
 
     def _mexican_hat(self, c, sigma):
         """Mexican hat centered in c."""
-        p = power(self._xx-self._xx.T[c], 2) + power(self._yy-self._yy.T[c], 2)
+        p = torch.pow(self._xx-self._xx.T[c], 2) + torch.pow(self._yy-self._yy.T[c], 2)
         d = 2*sigma*sigma
-        return (exp(-p/d)*(1-2/d*p)).T
+        return (torch.exp(-p/d)*(1-2/d*p)).T
 
     def _bubble(self, c, sigma):
         """Constant function centered in c with spread sigma.
@@ -480,9 +480,9 @@ class MiniSom(object):
             raise ValueError(f'scaling should be either "sum" or "mean" ('
                              f'"{scaling}" not valid)')
 
-        um = nan * zeros((self._weights.shape[0],
+        um = nan * torch.zeros(self._weights.shape[0],
                           self._weights.shape[1],
-                          8))  # 2 spots more for hexagonal topology
+                          8)  # 2 spots more for hexagonal topology
 
         ii = [[0, -1, -1, -1, 0, 1, 1, 1]]*2
         jj = [[-1, -1, 0, 1, 1, 1, 0, -1]]*2
@@ -514,7 +514,7 @@ class MiniSom(object):
             that the neuron i,j have been winner.
         """
         self._check_input_len(data)
-        a = zeros((self._weights.shape[0], self._weights.shape[1]))
+        a = torch.zeros(self._weights.shape[0], self._weights.shape[1])
         for x in data:
             a[self.winner(x)] += 1
         return a
@@ -525,8 +525,8 @@ class MiniSom(object):
         """
         input_data = array(data)
         weights_flat = self._weights.reshape(-1, self._weights.shape[2])
-        input_data_sq = power(input_data, 2).sum(axis=1, keepdims=True)
-        weights_flat_sq = power(weights_flat, 2).sum(axis=1, keepdims=True)
+        input_data_sq = torch.pow(input_data, 2).sum(axis=1, keepdims=True)
+        weights_flat_sq = torch.pow(weights_flat, 2).sum(axis=1, keepdims=True)
         cross_term = dot(input_data, weights_flat.T)
         return sqrt(-2 * cross_term + input_data_sq + weights_flat_sq.T)
 
