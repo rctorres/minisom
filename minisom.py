@@ -1,6 +1,6 @@
 from numpy import (unravel_index, nditer, max,
                    outer, dot,
-                   logical_and, mean, cov, argsort, linspace, transpose,
+                   logical_and, argsort, linspace, transpose,
                    einsum, prod, nan, sqrt, hstack, diff, argmin, multiply,
                    nanmean, nansum)
 from collections import defaultdict, Counter
@@ -371,7 +371,7 @@ class MiniSom(object):
             msg = 'PCA initialization inappropriate:' + \
                   'One of the dimensions of the map is 1.'
             warn(msg)
-        pc_length, pc = torch.linalg.eig(cov(transpose(data)))
+        pc_length, pc = torch.linalg.eig(torch.cov(transpose(data)))
         pc_order = argsort(-pc_length)
         for i, c1 in enumerate(linspace(-1, 1, len(self._neigx))):
             for j, c2 in enumerate(linspace(-1, 1, len(self._neigy))):
@@ -566,7 +566,7 @@ class MiniSom(object):
         b2mu_neighbors = [(bmu1 >= bmu2-1) & ((bmu1 <= bmu2+1))
                           for bmu1, bmu2 in b2mu_coords]
         b2mu_neighbors = [neighbors.prod() for neighbors in b2mu_neighbors]
-        te = 1 - mean(b2mu_neighbors)
+        te = 1 - torch.mean(b2mu_neighbors)
         return te
 
     def _topographic_error_rectangular(self, data):
