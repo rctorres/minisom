@@ -5,6 +5,7 @@ from numpy import (array, unravel_index, nditer, linalg, random, subtract, max,
                    nanmean, nansum, tile, array_equal)
 from numpy.linalg import norm
 from collections import defaultdict, Counter
+from collections.abc import Callable
 from warnings import warn
 from sys import stdout
 from time import time
@@ -83,10 +84,10 @@ def asymptotic_decay(learning_rate: float, t: int, max_iter: int) -> float:
 
 
 class MiniSom(object):
-    def __init__(self, x, y, input_len, sigma=1.0, learning_rate=0.5,
-                 decay_function=asymptotic_decay,
-                 neighborhood_function='gaussian', topology='rectangular',
-                 activation_distance='euclidean', random_seed=None):
+    def __init__(self, x: int, y: int, input_len: int, sigma: float=1.0, learning_rate: float=0.5,
+                 decay_function: Callable[[float, int, int]]=asymptotic_decay,
+                 neighborhood_function: str='gaussian', topology: str='rectangular',
+                 activation_distance: str='euclidean', random_seed: int=None):
         """Initializes a Self Organizing Maps.
 
         A rule of thumb to set the size of the grid for a dimensionality
