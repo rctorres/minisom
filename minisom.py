@@ -217,11 +217,11 @@ class MiniSom(object):
         elif callable(activation_distance):
             self._activation_distance = activation_distance
 
-    def get_weights(self):
+    def get_weights(self) -> torch.tensor:
         """Returns the weights of the neural network."""
         return self._weights
 
-    def get_euclidean_coordinates(self):
+    def get_euclidean_coordinates(self) -> torch.tensor:
         """Returns the position of the neurons on an euclidean
         plane that reflects the chosen topology in two meshgrids xx and yy.
         Neuron with map coordinates (1, 4) has coordinate (xx[1, 4], yy[1, 4])
@@ -231,7 +231,7 @@ class MiniSom(object):
         """
         return self._xx.T, self._yy.T
 
-    def convert_map_to_euclidean(self, xy):
+    def convert_map_to_euclidean(self, xy: torch.tensor) -> torch.tensor:
         """Converts map coordinates into euclidean coordinates
         that reflects the chosen topology.
 
@@ -239,17 +239,17 @@ class MiniSom(object):
         """
         return self._xx.T[xy], self._yy.T[xy]
 
-    def _activate(self, x):
+    def _activate(self, x: torch.tensor) -> None:
         """Updates matrix activation_map, in this matrix
            the element i,j is the response of the neuron i,j to x."""
         self._activation_map = self._activation_distance(x, self._weights)
 
-    def activate(self, x):
+    def activate(self, x: torch.tensor) -> torch.tensor:
         """Returns the activation map to x."""
         self._activate(x)
         return self._activation_map
 
-    def _gaussian(self, c, sigma):
+    def _gaussian(self, c: int, sigma: float) -> torch.tensor:
         """Returns a Gaussian centered in c."""
         d = 2*sigma*sigma
         ax = exp(-power(self._xx-self._xx.T[c], 2)/d)
