@@ -1,8 +1,8 @@
-from numpy import (array, unravel_index, nditer, linalg, random, subtract, max,
-                   power, exp, zeros, ones, arange, outer, meshgrid, dot,
+from numpy import (array, unravel_index, nditer, linalg, subtract, max,
+                   power, exp, zeros, outer, dot,
                    logical_and, mean, cov, argsort, linspace, transpose,
                    einsum, prod, nan, sqrt, hstack, diff, argmin, multiply,
-                   nanmean, nansum, tile, array_equal)
+                   nanmean, nansum)
 from numpy.linalg import norm
 from collections import defaultdict, Counter
 from collections.abc import Callable
@@ -10,8 +10,6 @@ from warnings import warn
 from sys import stdout
 from time import time
 from datetime import timedelta
-import pickle
-import os
 import torch
 
 """
