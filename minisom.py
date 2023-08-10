@@ -79,7 +79,7 @@ def asymptotic_decay(learning_rate: float, t: int, max_iter: int) -> float:
     max_iter : int
         maximum number of iterations for the training.
     """
-    return learning_rate / (1+t/(max_iter/2))
+    return learning_rate / (1.+t/(max_iter/2.))
 
 
 class MiniSom(object):

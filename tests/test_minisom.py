@@ -3,7 +3,7 @@ import pickle
 import pytest
 import torch
 from torch.testing import assert_close
-from minisom import MiniSom, _build_iteration_indexes, fast_norm
+from minisom import MiniSom, _build_iteration_indexes, fast_norm, asymptotic_decay
 
 
 class TestMinisom():
@@ -284,3 +284,8 @@ class TestMinisom():
         som2.train_random(data, 10)
         # same state after training
         assert_close(som1._weights, som2._weights)
+
+
+    def test_asymptotic_decay(self):
+        ret = asymptotic_decay(learning_rate=0.05, t=10, max_iter=30)
+        assert_close(ret, 0.03)
