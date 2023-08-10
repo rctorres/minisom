@@ -85,7 +85,7 @@ def asymptotic_decay(learning_rate: float, t: int, max_iter: int) -> float:
 
 class MiniSom(object):
     def __init__(self, x: int, y: int, input_len: int, sigma: float=1.0, learning_rate: float=0.5,
-                 decay_function: Callable[[float, int, int]]=asymptotic_decay,
+                 decay_function: Callable[[float, int, int], float]=asymptotic_decay,
                  neighborhood_function: str='gaussian', topology: str='rectangular',
                  activation_distance: str='euclidean', random_seed: int=None):
         """Initializes a Self Organizing Maps.
