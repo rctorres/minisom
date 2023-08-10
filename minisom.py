@@ -28,14 +28,13 @@ def _build_iteration_indexes(data_len: int, num_iterations: int,
     of numpy.random.RandomState and it will be used
     to randomize the order of the samples."""
     if use_epochs:
-        iterations_per_epoch = arange(data_len)
-        if random_generator:
-            random_generator.shuffle(iterations_per_epoch)
-        iterations = tile(iterations_per_epoch, num_iterations)
+        iterations_per_epoch = torch.randperm(data_len, generator=random_generator) if random_generator else torch.arange(data_len)
+        iterations = torch.tile(iterations_per_epoch, (1, num_iterations)).flatten()
     else:
-        iterations = arange(num_iterations) % data_len
+        iterations = torch.arange(num_iterations) % data_len
         if random_generator:
-            random_generator.shuffle(iterations)
+            shuffle_idx = torch.randperm(iterations.shape[0], generator=random_generator)
+            iterations = iterations[shuffle_idx]
     if verbose:
         return _wrap_index__in_verbose(iterations)
     else:
