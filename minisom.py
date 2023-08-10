@@ -1,7 +1,7 @@
 from numpy import (unravel_index, nditer, max,
                    outer, dot,
                    logical_and, argsort, linspace, transpose,
-                   einsum, prod, nan, sqrt, hstack, diff, argmin, multiply,
+                   einsum, prod, nan, hstack, diff, argmin, multiply,
                    nanmean, nansum)
 from collections import defaultdict, Counter
 from collections.abc import Callable
@@ -527,7 +527,7 @@ class MiniSom(object):
         input_data_sq = torch.pow(input_data, 2).sum(axis=1, keepdims=True)
         weights_flat_sq = torch.pow(weights_flat, 2).sum(axis=1, keepdims=True)
         cross_term = dot(input_data, weights_flat.T)
-        return sqrt(-2 * cross_term + input_data_sq + weights_flat_sq.T)
+        return torch.sqrt(-2 * cross_term + input_data_sq + weights_flat_sq.T)
 
     def quantization_error(self, data):
         """Returns the quantization error computed as the average
