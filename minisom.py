@@ -303,13 +303,13 @@ class MiniSom(object):
                                                           self._input_len)
             raise ValueError(msg)
 
-    def winner(self, x):
+    def winner(self, x: torch.tensor) -> Tuple[int, int]:
         """Computes the coordinates of the winning neuron for the sample x."""
         self._activate(x)
         return unravel_index(self._activation_map.argmin(),
                              self._activation_map.shape)
 
-    def update(self, x, win, t, max_iteration):
+    def update(self, x: torch.tensor, win: Tuple[int, int], t: int, max_iteration: int) -> None:
         """Updates the weights of the neurons.
 
         Parameters
@@ -334,7 +334,7 @@ class MiniSom(object):
         # w_new = eta * neighborhood_function * (x-w)
         self._weights += torch.einsum('ij, ijk->ijk', g, x-self._weights)
 
-    def quantization(self, data):
+    def quantization(self, data: torch.tensor) -> torch.tensor:
         """Assigns a code book (weights vector of the winning neuron)
         to each sample in data."""
         self._check_input_len(data)
@@ -342,7 +342,7 @@ class MiniSom(object):
         return self._weights[unravel_index(winners_coords,
                                            self._weights.shape[:2])]
 
-    def random_weights_init(self, data):
+    def random_weights_init(self, data: torch.tensor) -> None:
         """Initializes the weights of the SOM
         picking random samples from data."""
         self._check_input_len(data)
@@ -353,7 +353,7 @@ class MiniSom(object):
                 rand_i = torch.randint(high=n_samples, size=(1,1), generator=self._random_generator)[0,0]
                 self._weights[r,c] = data[rand_i]
 
-    def pca_weights_init(self, data):
+    def pca_weights_init(self, data: torch.tensor) -> None:
         """Initializes the weights to span the first two principal components.
 
         This initialization doesn't depend on random processes and
