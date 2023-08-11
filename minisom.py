@@ -1,5 +1,4 @@
 from numpy import (unravel_index, nditer,
-                   outer,
                    logical_and, argsort, linspace, transpose,
                    einsum, nan, hstack, diff, argmin, multiply,
                    nanmean, nansum)
@@ -269,7 +268,7 @@ class MiniSom(object):
                          self._neigx < c[0]+sigma)
         ay = logical_and(self._neigy > c[1]-sigma,
                          self._neigy < c[1]+sigma)
-        return outer(ax, ay)*1.
+        return torch.outer(ax, ay)*1.
 
     def _triangle(self, c, sigma):
         """Triangular function centered in c with spread sigma."""
@@ -277,7 +276,7 @@ class MiniSom(object):
         triangle_y = (-abs(c[1] - self._neigy)) + sigma
         triangle_x[triangle_x < 0] = 0.
         triangle_y[triangle_y < 0] = 0.
-        return outer(triangle_x, triangle_y)
+        return torch.outer(triangle_x, triangle_y)
 
     def _cosine_distance(self, x, w):
         num = (w * x).sum(axis=2)
