@@ -1,5 +1,5 @@
 from numpy import (unravel_index, nditer,
-                   logical_and, argsort, linspace, transpose,
+                   argsort, linspace, transpose,
                    einsum, nan, hstack, diff, argmin, multiply,
                    nanmean, nansum)
 from collections import defaultdict, Counter
@@ -264,10 +264,10 @@ class MiniSom(object):
         """Constant function centered in c with spread sigma.
         sigma should be an odd value.
         """
-        ax = logical_and(self._neigx > c[0]-sigma,
-                         self._neigx < c[0]+sigma)
-        ay = logical_and(self._neigy > c[1]-sigma,
-                         self._neigy < c[1]+sigma)
+        ax = torch.logical_and(self._neigx > c[0]-sigma,
+                                self._neigx < c[0]+sigma)
+        ay = torch.logical_and(self._neigy > c[1]-sigma,
+                                self._neigy < c[1]+sigma)
         return torch.outer(ax, ay)*1.
 
     def _triangle(self, c, sigma):
