@@ -151,7 +151,8 @@ class MiniSom(object):
             warn('Warning: sigma is too high for the dimension of the map.')
 
         self._random_generator = torch.Generator()
-        self._random_generator.manual_seed(random_seed)
+        if random_seed:
+            self._random_generator.manual_seed(random_seed)
 
         self._learning_rate = learning_rate
         self._sigma = sigma
