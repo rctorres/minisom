@@ -1,5 +1,5 @@
 from numpy import (unravel_index, nditer,
-                   linspace, transpose,
+                   transpose,
                    einsum, nan, hstack, diff, argmin, multiply,
                    nanmean, nansum)
 from collections import defaultdict, Counter
@@ -372,8 +372,8 @@ class MiniSom(object):
             warn(msg)
         pc_length, pc = torch.linalg.eig(torch.cov(transpose(data)))
         pc_order = torch.argsort(-pc_length)
-        for i, c1 in enumerate(linspace(-1, 1, len(self._neigx))):
-            for j, c2 in enumerate(linspace(-1, 1, len(self._neigy))):
+        for i, c1 in enumerate(torch.linspace(-1, 1, len(self._neigx))):
+            for j, c2 in enumerate(torch.linspace(-1, 1, len(self._neigy))):
                 self._weights[i, j] = c1*pc[:, pc_order[0]] + \
                                       c2*pc[:, pc_order[1]]
 
