@@ -96,24 +96,24 @@ class TestMinisom():
         assert sum(sum(bubble)) == 1
 
     def test_win_map(self, som):
-        winners = som.win_map([[5.0], [2.0]])
+        winners = som.win_map(torch.tensor([[5.0], [2.0]]))
         assert winners[(2, 3)][0] == [5.0]
         assert winners[(1, 1)][0] == [2.0]
 
     def test_win_map_indices(self, som):
-        winners = som.win_map([[5.0], [2.0]], return_indices=True)
+        winners = som.win_map(torch.tensor([[5.0], [2.0]]), return_indices=True)
         assert winners[(2, 3)] == [0]
         assert winners[(1, 1)] == [1]
 
     def test_labels_map(self, som):
-        labels_map = som.labels_map([[5.0], [2.0]], ['a', 'b'])
+        labels_map = som.labels_map(torch.tensor([[5.0], [2.0]]), ['a', 'b'])
         assert labels_map[(2, 3)]['a'] == 1
         assert labels_map[(1, 1)]['b'] == 1
         with pytest.raises(ValueError):
             som.labels_map([[5.0]], ['a', 'b'])
 
     def test_activation_reponse(self, som):
-        response = som.activation_response([[5.0], [2.0]])
+        response = som.activation_response(torch.tensor([[5.0], [2.0]]))
         assert response[2, 3] == 1
         assert response[1, 1] == 1
 
