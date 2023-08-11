@@ -1,4 +1,4 @@
-from numpy import unravel_index, nditer, transpose
+from numpy import unravel_index, nditer
 from collections import defaultdict, Counter
 from collections.abc import Callable
 from typing import Tuple
@@ -369,7 +369,7 @@ class MiniSom(object):
             msg = 'PCA initialization inappropriate:' + \
                   'One of the dimensions of the map is 1.'
             warn(msg)
-        pc_length, pc = torch.linalg.eig(torch.cov(transpose(data)))
+        pc_length, pc = torch.linalg.eig(torch.cov(data.T))
         pc_order = torch.argsort(-pc_length)
         for i, c1 in enumerate(torch.linspace(-1, 1, len(self._neigx))):
             for j, c2 in enumerate(torch.linspace(-1, 1, len(self._neigy))):
