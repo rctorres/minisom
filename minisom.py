@@ -1,6 +1,6 @@
 from numpy import (unravel_index, nditer,
                    transpose,
-                   nan, hstack, diff, argmin, multiply,
+                   hstack, diff, argmin, multiply,
                    nanmean, nansum)
 from collections import defaultdict, Counter
 from collections.abc import Callable
@@ -478,7 +478,7 @@ class MiniSom(object):
             raise ValueError(f'scaling should be either "sum" or "mean" ('
                              f'"{scaling}" not valid)')
 
-        um = nan * torch.zeros(self._weights.shape[0],
+        um = torch.nan * torch.zeros(self._weights.shape[0],
                           self._weights.shape[1],
                           8)  # 2 spots more for hexagonal topology
 
@@ -549,7 +549,7 @@ class MiniSom(object):
         total_neurons = torch.prod(self._activation_map.shape)
         if total_neurons == 1:
             warn('The topographic error is not defined for a 1-by-1 map.')
-            return nan
+            return torch.nan
         if self.topology == 'hexagonal':
             return self._topographic_error_hexagonal(data)
         else:
