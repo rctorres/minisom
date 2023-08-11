@@ -1,5 +1,5 @@
 from numpy import (unravel_index, nditer,
-                   argsort, linspace, transpose,
+                   linspace, transpose,
                    einsum, nan, hstack, diff, argmin, multiply,
                    nanmean, nansum)
 from collections import defaultdict, Counter
@@ -371,7 +371,7 @@ class MiniSom(object):
                   'One of the dimensions of the map is 1.'
             warn(msg)
         pc_length, pc = torch.linalg.eig(torch.cov(transpose(data)))
-        pc_order = argsort(-pc_length)
+        pc_order = torch.argsort(-pc_length)
         for i, c1 in enumerate(linspace(-1, 1, len(self._neigx))):
             for j, c2 in enumerate(linspace(-1, 1, len(self._neigy))):
                 self._weights[i, j] = c1*pc[:, pc_order[0]] + \
@@ -557,7 +557,7 @@ class MiniSom(object):
 
     def _topographic_error_hexagonal(self, data):
         """Return the topographic error for hexagonal grid"""
-        b2mu_inds = argsort(self._distance_from_weights(data), axis=1)[:, :2]
+        b2mu_inds = torch.argsort(self._distance_from_weights(data), dim=1)[:, :2]
         b2mu_coords = [[self._get_euclidean_coordinates_from_index(bmu[0]),
                         self._get_euclidean_coordinates_from_index(bmu[1])]
                        for bmu in b2mu_inds]
@@ -572,7 +572,7 @@ class MiniSom(object):
         """Return the topographic error for rectangular grid"""
         t = 1.42
         # b2mu: best 2 matching units
-        b2mu_inds = argsort(self._distance_from_weights(data), axis=1)[:, :2]
+        b2mu_inds = torch.argsort(self._distance_from_weights(data), dim=1)[:, :2]
         b2my_xy = unravel_index(b2mu_inds, self._weights.shape[:2])
         b2mu_x, b2mu_y = b2my_xy[0], b2my_xy[1]
         dxdy = hstack([diff(b2mu_x), diff(b2mu_y)])
