@@ -14,7 +14,7 @@ class TestMinisom():
         for i in range(5):
             for j in range(5):
                 # checking weights normalization
-                assert_close(1.0, torch.linalg.norm(ret._weights[i, j]))
+                assert_close(torch.tensor(1.0), torch.linalg.norm(ret._weights[i, j]))
         ret._weights = torch.zeros((5, 5, 1))  # fake weights
         ret._weights[2, 3] = 5.0
         ret._weights[1, 1] = 2.0
