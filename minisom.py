@@ -371,7 +371,7 @@ class MiniSom(object):
                   'One of the dimensions of the map is 1.'
             warn(msg)
         pc_length, pc = torch.linalg.eig(torch.cov(data.T))
-        pc_order = torch.argsort(-pc_length)
+        pc_order = torch.argsort(pc_length.real, descending=True)
         for i, c1 in enumerate(torch.linspace(-1, 1, len(self._neigx))):
             for j, c2 in enumerate(torch.linspace(-1, 1, len(self._neigy))):
                 self._weights[i, j] = c1*pc[:, pc_order[0]] + \
