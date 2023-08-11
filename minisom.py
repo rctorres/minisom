@@ -1,4 +1,4 @@
-from numpy import unravel_index, nditer
+from numpy import unravel_index
 from collections import defaultdict, Counter
 from collections.abc import Callable
 from typing import Tuple
@@ -346,11 +346,12 @@ class MiniSom(object):
         """Initializes the weights of the SOM
         picking random samples from data."""
         self._check_input_len(data)
-        it = nditer(self._activation_map, flags=['multi_index'])
-        while not it.finished:
-            rand_i = self._random_generator.randint(len(data))
-            self._weights[it.multi_index] = data[rand_i]
-            it.iternext()
+        n_samples = len(data)
+        n_rows, n_cols = self._activation_map.shape
+        for r in range(n_rows):
+            for c in range(n_cols):
+                rand_i = torch.randint(high=n_samples, size=(1,1), generator=self._random_generator)[0,0]
+                self._weights[r,c] = data[rand_i]
 
     def pca_weights_init(self, data):
         """Initializes the weights to span the first two principal components.
