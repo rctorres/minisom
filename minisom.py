@@ -1,6 +1,6 @@
 from numpy import (unravel_index, nditer,
                    transpose,
-                   diff, argmin, multiply,
+                   argmin, multiply,
                    nanmean, nansum)
 from collections import defaultdict, Counter
 from collections.abc import Callable
@@ -575,7 +575,7 @@ class MiniSom(object):
         b2mu_inds = torch.argsort(self._distance_from_weights(data), dim=1)[:, :2]
         b2my_xy = unravel_index(b2mu_inds, self._weights.shape[:2])
         b2mu_x, b2mu_y = b2my_xy[0], b2my_xy[1]
-        dxdy = torch.hstack([diff(b2mu_x), diff(b2mu_y)])
+        dxdy = torch.hstack([torch.diff(b2mu_x), torch.diff(b2mu_y)])
         distance = torch.linalg.norm(dxdy, axis=1)
         return (distance > t).mean()
 
