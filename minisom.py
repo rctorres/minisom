@@ -517,15 +517,14 @@ class MiniSom(object):
             a[self.winner(x)] += 1
         return a
 
-    def _distance_from_weights(self, data):
+    def _distance_from_weights(self, data: torch.tensor) -> torch.tensor:
         """Returns a matrix d where d[i,j] is the euclidean distance between
         data[i] and the j-th weight.
         """
-        input_data = torch.tensor(data)
         weights_flat = self._weights.reshape(-1, self._weights.shape[2])
-        input_data_sq = torch.pow(input_data, 2).sum(axis=1, keepdims=True)
+        input_data_sq = torch.pow(data, 2).sum(axis=1, keepdims=True)
         weights_flat_sq = torch.pow(weights_flat, 2).sum(axis=1, keepdims=True)
-        cross_term = torch.dot(input_data, weights_flat.T)
+        cross_term = torch.dot(data, weights_flat.T)
         return torch.sqrt(-2 * cross_term + input_data_sq + weights_flat_sq.T)
 
     def quantization_error(self, data):
