@@ -295,9 +295,9 @@ class MiniSom(object):
         if num_iteration < 1:
             raise ValueError('num_iteration must be > 1')
 
-    def _check_input_len(self, data: torch.tensor) -> None:
+    def _check_input_len(self, data: list) -> None:
         """Checks that the data in input is of the correct shape."""
-        data_len = data[0].shape[0]
+        data_len = len(data[0])
         if self._input_len != data_len:
             msg = 'Received %d features, expected %d.' % (data_len,
                                                           self._input_len)
