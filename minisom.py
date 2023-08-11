@@ -1,7 +1,7 @@
 from numpy import (unravel_index, nditer,
                    outer,
                    logical_and, argsort, linspace, transpose,
-                   einsum, prod, nan, hstack, diff, argmin, multiply,
+                   einsum, nan, hstack, diff, argmin, multiply,
                    nanmean, nansum)
 from collections import defaultdict, Counter
 from collections.abc import Callable
@@ -547,7 +547,7 @@ class MiniSom(object):
         If the topographic error is 0, no error occurred.
         If 1, the topology was not preserved for any of the samples."""
         self._check_input_len(data)
-        total_neurons = prod(self._activation_map.shape)
+        total_neurons = torch.prod(self._activation_map.shape)
         if total_neurons == 1:
             warn('The topographic error is not defined for a 1-by-1 map.')
             return nan
