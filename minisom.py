@@ -1,5 +1,5 @@
 from numpy import (unravel_index, nditer,
-                   outer, dot,
+                   outer,
                    logical_and, argsort, linspace, transpose,
                    einsum, prod, nan, hstack, diff, argmin, multiply,
                    nanmean, nansum)
@@ -526,7 +526,7 @@ class MiniSom(object):
         weights_flat = self._weights.reshape(-1, self._weights.shape[2])
         input_data_sq = torch.pow(input_data, 2).sum(axis=1, keepdims=True)
         weights_flat_sq = torch.pow(weights_flat, 2).sum(axis=1, keepdims=True)
-        cross_term = dot(input_data, weights_flat.T)
+        cross_term = torch.dot(input_data, weights_flat.T)
         return torch.sqrt(-2 * cross_term + input_data_sq + weights_flat_sq.T)
 
     def quantization_error(self, data):
