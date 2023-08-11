@@ -1,6 +1,6 @@
 from numpy import (unravel_index, nditer,
                    transpose,
-                   argmin, multiply,
+                   multiply,
                    nanmean, nansum)
 from collections import defaultdict, Counter
 from collections.abc import Callable
@@ -339,7 +339,7 @@ class MiniSom(object):
         """Assigns a code book (weights vector of the winning neuron)
         to each sample in data."""
         self._check_input_len(data)
-        winners_coords = argmin(self._distance_from_weights(data), axis=1)
+        winners_coords = torch.argmin(self._distance_from_weights(data), dim=1)
         return self._weights[unravel_index(winners_coords,
                                            self._weights.shape[:2])]
 
