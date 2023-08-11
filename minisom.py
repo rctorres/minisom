@@ -1,6 +1,6 @@
 from numpy import (unravel_index, nditer,
                    transpose,
-                   einsum, nan, hstack, diff, argmin, multiply,
+                   nan, hstack, diff, argmin, multiply,
                    nanmean, nansum)
 from collections import defaultdict, Counter
 from collections.abc import Callable
@@ -333,7 +333,7 @@ class MiniSom(object):
         # improves the performances
         g = self.neighborhood(win, sig)*eta
         # w_new = eta * neighborhood_function * (x-w)
-        self._weights += einsum('ij, ijk->ijk', g, x-self._weights)
+        self._weights += torch.einsum('ij, ijk->ijk', g, x-self._weights)
 
     def quantization(self, data):
         """Assigns a code book (weights vector of the winning neuron)
