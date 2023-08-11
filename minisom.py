@@ -1,6 +1,4 @@
-from numpy import (unravel_index, nditer,
-                   transpose,
-                   nansum)
+from numpy import unravel_index, nditer, transpose
 from collections import defaultdict, Counter
 from collections.abc import Callable
 from warnings import warn
@@ -501,7 +499,7 @@ class MiniSom(object):
         if scaling == 'mean':
             um = torch.nanmean(um, dim=2)
         if scaling == 'sum':
-            um = nansum(um, axis=2)
+            um = torch.nansum(um, dim=2)
 
         return um/um.max()[0]
 
