@@ -1,6 +1,5 @@
 from numpy import (unravel_index, nditer,
                    transpose,
-                   multiply,
                    nanmean, nansum)
 from collections import defaultdict, Counter
 from collections.abc import Callable
@@ -280,7 +279,7 @@ class MiniSom(object):
 
     def _cosine_distance(self, x, w):
         num = (w * x).sum(axis=2)
-        denum = multiply(torch.linalg.norm(w, axis=2), torch.linalg.norm(x))
+        denum = torch.mul(torch.linalg.norm(w, axis=2), torch.linalg.norm(x))
         return 1 - num / (denum+1e-8)
 
     def _euclidean_distance(self, x, w):
