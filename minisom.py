@@ -1,6 +1,7 @@
 from numpy import unravel_index, nditer, transpose
 from collections import defaultdict, Counter
 from collections.abc import Callable
+from typing import Tuple
 from warnings import warn
 from sys import stdout
 from time import time
@@ -245,20 +246,20 @@ class MiniSom(object):
         self._activate(x)
         return self._activation_map
 
-    def _gaussian(self, c: int, sigma: float) -> torch.tensor:
+    def _gaussian(self, c: Tuple[int, int], sigma: float) -> float:
         """Returns a Gaussian centered in c."""
         d = 2*sigma*sigma
         ax = torch.exp(-torch.pow(self._xx-self._xx.T[c], 2)/d)
         ay = torch.exp(-torch.pow(self._yy-self._yy.T[c], 2)/d)
         return (ax * ay).T  # the external product gives a matrix
 
-    def _mexican_hat(self, c, sigma):
+    def _mexican_hat(self, c: Tuple[int, int], sigma: float) -> float:
         """Mexican hat centered in c."""
         p = torch.pow(self._xx-self._xx.T[c], 2) + torch.pow(self._yy-self._yy.T[c], 2)
         d = 2*sigma*sigma
         return (torch.exp(-p/d)*(1-2/d*p)).T
 
-    def _bubble(self, c, sigma):
+    def _bubble(self, c: Tuple[int, int], sigma: float) -> float:
         """Constant function centered in c with spread sigma.
         sigma should be an odd value.
         """
@@ -268,7 +269,7 @@ class MiniSom(object):
                                 self._neigy < c[1]+sigma)
         return torch.outer(ax, ay)*1.
 
-    def _triangle(self, c, sigma):
+    def _triangle(self, c: Tuple[int, int], sigma: float) -> float:
         """Triangular function centered in c with spread sigma."""
         triangle_x = (-abs(c[0] - self._neigx)) + sigma
         triangle_y = (-abs(c[1] - self._neigy)) + sigma
@@ -276,21 +277,21 @@ class MiniSom(object):
         triangle_y[triangle_y < 0] = 0.
         return torch.outer(triangle_x, triangle_y)
 
-    def _cosine_distance(self, x, w):
+    def _cosine_distance(self, x: torch.tensor, w: torch.tensor) -> float:
         num = (w * x).sum(axis=2)
         denum = torch.mul(torch.linalg.norm(w, axis=2), torch.linalg.norm(x))
         return 1 - num / (denum+1e-8)
 
-    def _euclidean_distance(self, x, w):
+    def _euclidean_distance(self, x: torch.tensor, w: torch.tensor) -> float:
         return torch.linalg.norm(torch.subtract(x, w), axis=-1)
 
-    def _manhattan_distance(self, x, w):
+    def _manhattan_distance(self, x: torch.tensor, w: torch.tensor) -> float:
         return torch.linalg.norm(torch.subtract(x, w), ord=1, axis=-1)
 
-    def _chebyshev_distance(self, x, w):
+    def _chebyshev_distance(self, x: torch.tensor, w: torch.tensor) -> float:
         return torch.max(torch.subtract(x, w), dim=-1)[0]
 
-    def _check_iteration_number(self, num_iteration):
+    def _check_iteration_number(self, num_iteration: int) -> None:
         if num_iteration < 1:
             raise ValueError('num_iteration must be > 1')
 
