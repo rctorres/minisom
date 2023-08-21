@@ -545,7 +545,7 @@ class MiniSom(object):
         If the topographic error is 0, no error occurred.
         If 1, the topology was not preserved for any of the samples."""
         self._check_input_len(data)
-        total_neurons = torch.prod(self._activation_map.shape)
+        total_neurons = torch.prod(torch.tensor(self._activation_map.shape))
         if total_neurons == 1:
             warn('The topographic error is not defined for a 1-by-1 map.')
             return torch.nan
@@ -563,7 +563,7 @@ class MiniSom(object):
         b2mu_coords = torch.tensor(b2mu_coords)
         b2mu_neighbors = [(bmu1 >= bmu2-1) & ((bmu1 <= bmu2+1))
                           for bmu1, bmu2 in b2mu_coords]
-        b2mu_neighbors = [neighbors.prod() for neighbors in b2mu_neighbors]
+        b2mu_neighbors = torch.tensor([neighbors.prod() for neighbors in b2mu_neighbors], dtype=torch.float32)
         te = 1 - torch.mean(b2mu_neighbors)
         return te
 
@@ -572,11 +572,11 @@ class MiniSom(object):
         t = 1.42
         # b2mu: best 2 matching units
         b2mu_inds = torch.argsort(self._distance_from_weights(data), dim=1)[:, :2]
-        b2my_xy = unravel_index(b2mu_inds, self._weights.shape[:2])
+        b2my_xy = torch.tensor(unravel_index(b2mu_inds, self._weights.shape[:2]), dtype=torch.float32)
         b2mu_x, b2mu_y = b2my_xy[0], b2my_xy[1]
         dxdy = torch.hstack([torch.diff(b2mu_x), torch.diff(b2mu_y)])
         distance = torch.linalg.norm(dxdy, axis=1)
-        return (distance > t).mean()
+        return (distance > t).float().mean()
 
     def _get_euclidean_coordinates_from_index(self, index):
         """Returns the Euclidean coordinated of a neuron using its

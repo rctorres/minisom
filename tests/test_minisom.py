@@ -140,8 +140,8 @@ class TestMinisom():
         # which are not in the same neighborhood
         som._weights[4, 4] = 15.0
         som._weights[0, 0] = 14.
-        assert som.topographic_error([[5]]) == 0.0
-        assert som.topographic_error([[15]]) == 1.0
+        assert som.topographic_error(torch.tensor([[5]])) == 0.0
+        assert som.topographic_error(torch.tensor([[15]])) == 1.0
 
         som.topology = 'hexagonal'
         # 10 will have bmu_1 in (0, 4) and bmu_2 in (1, 3)
@@ -151,11 +151,11 @@ class TestMinisom():
         # 3 will have bmu_1 in (2, 0) and bmu_2 in (1, 1)
         # which are in the same neighborhood on a hexagonal grid
         som._weights[2, 0] = 3.0
-        assert som.topographic_error([[10]]) == 0.0
-        assert som.topographic_error([[3]]) == 0.0
+        assert som.topographic_error(torch.tensor([[10]])) == 0.0
+        assert som.topographic_error(torch.tensor([[3]])) == 0.0
         # True for both hexagonal and rectangular grids
-        assert som.topographic_error([[5]]) == 0.0
-        assert som.topographic_error([[15]]) == 1.0
+        assert som.topographic_error(torch.tensor([[5]])) == 0.0
+        assert som.topographic_error(torch.tensor([[15]])) == 1.0
         som.topology = 'rectangular'
 
     def test_quantization(self, som):
