@@ -129,8 +129,8 @@ class TestMinisom():
                 assert (distances[i][j] == torch.linalg.norm(data[i] - weights[j]))
 
     def test_quantization_error(self, som):
-        assert som.quantization_error([[5], [2]]) == 0.0
-        assert som.quantization_error([[4], [1]]) == 1.0
+        assert som.quantization_error(torch.tensor([[5], [2]])) == 0.0
+        assert som.quantization_error(torch.tensor([[4], [1]])) == 1.0
 
     def test_topographic_error(self, som):
         # 5 will have bmu_1 in (2,3) and bmu_2 in (2, 4)
