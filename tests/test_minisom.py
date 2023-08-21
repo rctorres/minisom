@@ -97,8 +97,8 @@ class TestMinisom():
 
     def test_win_map(self, som):
         winners = som.win_map(torch.tensor([[5.0], [2.0]]))
-        assert winners[(2, 3)][0] == [5.0]
-        assert winners[(1, 1)][0] == [2.0]
+        assert winners[(2, 3)][0] == 5.0
+        assert winners[(1, 1)][0] == 2.0
 
     def test_win_map_indices(self, som):
         winners = som.win_map(torch.tensor([[5.0], [2.0]]), return_indices=True)
