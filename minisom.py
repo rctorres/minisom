@@ -524,7 +524,7 @@ class MiniSom(object):
         weights_flat = self._weights.reshape(-1, self._weights.shape[2])
         input_data_sq = torch.pow(data, 2).sum(axis=1, keepdims=True)
         weights_flat_sq = torch.pow(weights_flat, 2).sum(axis=1, keepdims=True)
-        cross_term = torch.dot(data, weights_flat.T)
+        cross_term = data * weights_flat.T
         return torch.sqrt(-2 * cross_term + input_data_sq + weights_flat_sq.T)
 
     def quantization_error(self, data):
