@@ -590,7 +590,11 @@ class MiniSom(object):
         self._check_input_len(data)
         winmap = defaultdict(list)
         for i, x in enumerate(data):
-            winmap[self.winner(x)].append(i if return_indices else x)
+            winmap[self.winner(x)].append(torch.tensor(i, dtype=torch.int32) if return_indices else x)
+        
+        for k,v in winmap.items():
+            winmap[k] = torch.stack(v, dim=0)
+
         return winmap
 
     def labels_map(self, data, labels):
