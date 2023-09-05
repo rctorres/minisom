@@ -258,7 +258,11 @@ class TestMinisom():
         assert torch.equal(som.distance_map(), torch.tensor([[.5, 1.], [1., .5]]))
 
         som = MiniSom(3, 3, 1, random_seed=1)
-        som._weights = torch.tensor([[1, 0, 1], [0, 1, 0], [1, 0, 1]])
+        som._weights = torch.tensor([
+                [[1.], [0.], [1.]],
+                [[0.], [1.], [0.]],
+                [[1.], [0.], [1.]]
+            ])
         dist = torch.tensor([[2/3, 3/5, 2/3], [3/5, 4/8, 3/5], [2/3, 3/5, 2/3]])
         assert torch.equal(som.distance_map(scaling='mean'), dist/dist.max())
 

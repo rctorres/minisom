@@ -174,7 +174,7 @@ class MiniSom(object):
         self._xx = self._xx.float()
         self._yy = self._yy.float()
         if topology == 'hexagonal':
-            self._xx[::-2] -= 0.5
+            self._xx[1::2] -= 0.5
             if neighborhood_function in ['triangle']:
                 warn('triangle neighborhood function does not ' +
                      'take in account hexagonal topology')
@@ -504,7 +504,7 @@ class MiniSom(object):
         if scaling == 'sum':
             um = torch.nansum(um, dim=2)
 
-        return um/um.max()[0]
+        return um/um.max()
 
     def activation_response(self, data):
         """
