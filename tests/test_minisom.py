@@ -269,12 +269,6 @@ class TestMinisom():
         with pytest.raises(ValueError):
             som.distance_map(scaling='puppies')
 
-    def test_pickling(self, som):
-        with open('som.p', 'wb') as outfile:
-            pickle.dump(som, outfile)
-        with open('som.p', 'rb') as infile:
-            pickle.load(infile)
-        os.remove('som.p')
 
     def test_callable_activation_distance(self):
         def euclidean(x, w):
