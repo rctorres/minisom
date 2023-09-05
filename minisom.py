@@ -55,12 +55,6 @@ def _wrap_index__in_verbose(iterations: torch.tensor) -> None:
         stdout.write(progress)
 
 
-def fast_norm(x: torch.tensor) -> float:
-    """Returns norm-2 of a 1-D numpy array.
-    """
-    return torch.sqrt(torch.dot(x, x.T))
-
-
 def asymptotic_decay(learning_rate: float, t: int, max_iter: int) -> float:
     """Decay function of the learning process.
     Parameters
@@ -497,7 +491,7 @@ class MiniSom(object):
                     if (x+i >= 0 and x+i < self._weights.shape[0] and
                             y+j >= 0 and y+j < self._weights.shape[1]):
                         w_1 = self._weights[x+i, y+j]
-                        um[x, y, k] = fast_norm(w_2-w_1)
+                        um[x, y, k] = torch.linalg.norm(w_2-w_1)
 
         if scaling == 'mean':
             um = torch.nanmean(um, dim=2)
