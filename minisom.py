@@ -572,8 +572,8 @@ class MiniSom(object):
         t = 1.42
         # b2mu: best 2 matching units
         b2mu_inds = torch.argsort(self._distance_from_weights(data), dim=1)[:, :2]
-        b2my_xy = torch.tensor(unravel_index(b2mu_inds, self._weights.shape[:2]), dtype=torch.float32)
-        b2mu_x, b2mu_y = b2my_xy[0], b2my_xy[1]
+        b2my_xy = unravel_index(b2mu_inds, self._weights.shape[:2])
+        b2mu_x, b2mu_y = torch.tensor(b2my_xy[0], dtype=torch.float32), torch.tensor(b2my_xy[1], dtype=torch.float32)
         dxdy = torch.hstack([torch.diff(b2mu_x), torch.diff(b2mu_y)])
         distance = torch.linalg.norm(dxdy, axis=1)
         return (distance > t).float().mean()
