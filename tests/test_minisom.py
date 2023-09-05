@@ -121,7 +121,7 @@ class TestMinisom():
         assert som.activate(5.0).argmin() == 13.0  # unravel(13) = (2,3)
 
     def test_distance_from_weights(self, som):
-        data = torch.arange(-5, 5).reshape(-1, 1)
+        data = torch.arange(-5., 5.).reshape(-1, 1)
         weights = som._weights.reshape(-1, som._weights.shape[2])
         distances = som._distance_from_weights(data)
         for i in range(len(data)):
@@ -129,8 +129,8 @@ class TestMinisom():
                 assert (distances[i][j] == torch.linalg.norm(data[i] - weights[j]))
 
     def test_quantization_error(self, som):
-        assert som.quantization_error(torch.tensor([[5], [2]])) == 0.0
-        assert som.quantization_error(torch.tensor([[4], [1]])) == 1.0
+        assert som.quantization_error(torch.tensor([[5.], [2.]])) == 0.0
+        assert som.quantization_error(torch.tensor([[4.], [1.]])) == 1.0
 
     def test_topographic_error(self, som):
         # 5 will have bmu_1 in (2,3) and bmu_2 in (2, 4)
@@ -140,8 +140,8 @@ class TestMinisom():
         # which are not in the same neighborhood
         som._weights[4, 4] = 15.0
         som._weights[0, 0] = 14.
-        assert som.topographic_error(torch.tensor([[5]])) == 0.0
-        assert som.topographic_error(torch.tensor([[15]])) == 1.0
+        assert som.topographic_error(torch.tensor([[5.]])) == 0.0
+        assert som.topographic_error(torch.tensor([[15.]])) == 1.0
 
         som.topology = 'hexagonal'
         # 10 will have bmu_1 in (0, 4) and bmu_2 in (1, 3)
@@ -151,15 +151,15 @@ class TestMinisom():
         # 3 will have bmu_1 in (2, 0) and bmu_2 in (1, 1)
         # which are in the same neighborhood on a hexagonal grid
         som._weights[2, 0] = 3.0
-        assert som.topographic_error(torch.tensor([[10]])) == 0.0
-        assert som.topographic_error(torch.tensor([[3]])) == 0.0
+        assert som.topographic_error(torch.tensor([[10.]])) == 0.0
+        assert som.topographic_error(torch.tensor([[3.]])) == 0.0
         # True for both hexagonal and rectangular grids
-        assert som.topographic_error(torch.tensor([[5]])) == 0.0
-        assert som.topographic_error(torch.tensor([[15]])) == 1.0
+        assert som.topographic_error(torch.tensor([[5.]])) == 0.0
+        assert som.topographic_error(torch.tensor([[15.]])) == 1.0
         som.topology = 'rectangular'
 
     def test_quantization(self, som):
-        q = som.quantization(torch.tensor([[4], [2]]))
+        q = som.quantization(torch.tensor([[4.], [2.]]))
         assert q[0] == 5.0
         assert q[1] == 2.0
 
@@ -178,31 +178,31 @@ class TestMinisom():
 
     def test_train_batch(self):
         som = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
-        data = torch.tensor([[4, 2], [3, 1]])
+        data = torch.tensor([[4., 2.], [3., 1.]])
         q1 = som.quantization_error(data)
         som.train(data, 10)
         assert q1 > som.quantization_error(data)
 
-        data = torch.tensor([[1, 5], [6, 7]])
+        data = torch.tensor([[1., 5.], [6., 7.]])
         q1 = som.quantization_error(data)
         som.train_batch(data, 10, verbose=True)
         assert q1 > som.quantization_error(data)
 
     def test_train_random(self):
         som = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
-        data = torch.tensor([[4, 2], [3, 1]])
+        data = torch.tensor([[4., 2.], [3., 1.]])
         q1 = som.quantization_error(data)
         som.train(data, 10, random_order=True)
         assert q1 > som.quantization_error(data)
 
-        data = torch.tensor([[1, 5], [6, 7]])
+        data = torch.tensor([[1., 5.], [6., 7.]])
         q1 = som.quantization_error(data)
         som.train_random(data, 10, verbose=True)
         assert q1 > som.quantization_error(data)
 
     def test_train_use_epochs(self):
         som = MiniSom(5, 5, 2, sigma=1.0, learning_rate=0.5, random_seed=1)
-        data = torch.tensor([[4, 2], [3, 1]])
+        data = torch.tensor([[4., 2.], [3., 1.]])
         q1 = som.quantization_error(data)
         som.train(data, 10, use_epochs=True)
         assert q1 > som.quantization_error(data)
