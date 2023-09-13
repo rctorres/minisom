@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
     main:
-        container_name: minisom
-        image: minisom
+        container_name: minisom-gpu
+        image: minisom-gpu
         build:
             context: .
             args:
