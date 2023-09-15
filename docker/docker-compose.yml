@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
     main:
-        container_name: minisom-gpu
-        image: minisom-gpu
+        container_name: ${COMPOSE_PROJECT_NAME?err}
+        image: ${COMPOSE_PROJECT_NAME?err}
         build:
             context: .
             args:
