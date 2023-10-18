@@ -3,8 +3,9 @@
 Self Organizing Maps
 --------------------
 
-MiniSom is a minimalistic and PyTorch based implementation of the Self Organizing Maps (SOM). SOM is a type of Artificial Neural Network able to convert complex, nonlinear statistical relationships between high-dimensional data items into simple geometric relationships on a low-dimensional display. Minisom is designed to allow researchers to easily build on top of it and to give students the ability to quickly grasp its details.
+MiniSom GPU is a minimalistic and PyTorch based implementation of the Self Organizing Maps (SOM). SOM is a type of Artificial Neural Network able to convert complex, nonlinear statistical relationships between high-dimensional data items into simple geometric relationships on a low-dimensional display. Minisom is designed to allow researchers to easily build on top of it and to give students the ability to quickly grasp its details.
 
+This repository is a fork of the original [MiniSom package](https://github.com/JustGlowing/minisom).
 
 Installation
 ---------------------
