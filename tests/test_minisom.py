@@ -3,7 +3,7 @@ import pickle
 import pytest
 import torch
 from torch.testing import assert_close
-from minisom import MiniSom, _build_iteration_indexes, asymptotic_decay
+from minisom_gpu.som import MiniSom, _build_iteration_indexes, asymptotic_decay
 
 
 class TestMinisom():
