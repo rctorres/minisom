@@ -75,7 +75,7 @@ class MiniSom(object):
     def __init__(self, x: int, y: int, input_len: int, sigma: float=1.0, learning_rate: float=0.5,
                  decay_function: Callable[[float, int, int], float]=asymptotic_decay,
                  neighborhood_function: str='gaussian', topology: str='rectangular',
-                 activation_distance: str='euclidean', random_seed: int=None):
+                 activation_distance: str='euclidean', random_seed: int=None, device='cpu'):
         """Initializes a Self Organizing Maps.
 
         A rule of thumb to set the size of the grid for a dimensionality
@@ -145,7 +145,7 @@ class MiniSom(object):
         if sigma >= x or sigma >= y:
             warn('Warning: sigma is too high for the dimension of the map.')
 
-        self._random_generator = torch.Generator()
+        self._random_generator = torch.Generator(device=device)
         if random_seed:
             self._random_generator.manual_seed(random_seed)
 
@@ -300,7 +300,7 @@ class MiniSom(object):
     def winner(self, x: torch.tensor) -> Tuple[int, int]:
         """Computes the coordinates of the winning neuron for the sample x."""
         self._activate(x)
-        return unravel_index(self._activation_map.argmin(),
+        return unravel_index(self._activation_map.argmin().cpu(),
                              self._activation_map.shape)
 
     def update(self, x: torch.tensor, win: Tuple[int, int], t: int, max_iteration: int) -> None:
