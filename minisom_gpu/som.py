@@ -15,7 +15,7 @@ import torch
 
 def _build_iteration_indexes(data_len: int, num_iterations: int,
                              verbose: bool=False, random_generator: torch.Generator=None,
-                             use_epochs: bool=False) -> torch.tensor:
+                             use_epochs: bool=False, device='cpu') -> torch.tensor:
     """Returns an iterable with the indexes of the samples
     to pick at each iteration of the training.
 
@@ -23,12 +23,12 @@ def _build_iteration_indexes(data_len: int, num_iterations: int,
     of numpy.random.RandomState and it will be used
     to randomize the order of the samples."""
     if use_epochs:
-        iterations_per_epoch = torch.randperm(data_len, generator=random_generator) if random_generator else torch.arange(data_len)
+        iterations_per_epoch = torch.randperm(data_len, generator=random_generator, device=device) if random_generator else torch.arange(data_len, device=device)
         iterations = torch.tile(iterations_per_epoch, (1, num_iterations)).flatten()
     else:
-        iterations = torch.arange(num_iterations) % data_len
+        iterations = torch.arange(num_iterations, device=device) % data_len
         if random_generator:
-            shuffle_idx = torch.randperm(iterations.shape[0], generator=random_generator)
+            shuffle_idx = torch.randperm(iterations.shape[0], generator=random_generator, device=device)
             iterations = iterations[shuffle_idx]
     if verbose:
         return _wrap_index__in_verbose(iterations)
@@ -142,6 +142,8 @@ class MiniSom(object):
         random_seed : int, optional (default=None)
             Random seed to use.
         """
+
+        self.device = device
         if sigma >= x or sigma >= y:
             warn('Warning: sigma is too high for the dimension of the map.')
 
@@ -153,12 +155,12 @@ class MiniSom(object):
         self._sigma = sigma
         self._input_len = input_len
         # random initialization
-        self._weights = torch.rand(x, y, input_len, generator=self._random_generator)*2-1
+        self._weights = torch.rand(x, y, input_len, generator=self._random_generator, device=self.device)*2-1
         self._weights /= torch.linalg.norm(self._weights, axis=-1, keepdims=True)
 
-        self._activation_map = torch.zeros(x, y)
-        self._neigx = torch.arange(x)
-        self._neigy = torch.arange(y)  # used to evaluate the neighborhood function
+        self._activation_map = torch.zeros(x, y, device=self.device)
+        self._neigx = torch.arange(x, device=self.device)
+        self._neigy = torch.arange(y, device=self.device)  # used to evaluate the neighborhood function
 
         if topology not in ['hexagonal', 'rectangular']:
             msg = '%s not supported only hexagonal and rectangular available'
@@ -332,9 +334,9 @@ class MiniSom(object):
         """Assigns a code book (weights vector of the winning neuron)
         to each sample in data."""
         self._check_input_len(data)
-        winners_coords = torch.argmin(self._distance_from_weights(data), dim=1)
-        return self._weights[unravel_index(winners_coords,
-                                           self._weights.shape[:2])]
+        winners_coords = torch.argmin(self._distance_from_weights(data), dim=1).cpu()
+        x2_coords = unravel_index(winners_coords, self._weights.shape[:2])
+        return self._weights[x2_coords]
 
     def random_weights_init(self, data: torch.tensor) -> None:
         """Initializes the weights of the SOM
@@ -344,7 +346,7 @@ class MiniSom(object):
         n_rows, n_cols = self._activation_map.shape
         for r in range(n_rows):
             for c in range(n_cols):
-                rand_i = torch.randint(high=n_samples, size=(1,1), generator=self._random_generator)[0,0]
+                rand_i = torch.randint(high=n_samples, size=(1,1), generator=self._random_generator, device=self.device)[0,0]
                 self._weights[r,c] = data[rand_i]
 
     def pca_weights_init(self, data: torch.tensor) -> None:
@@ -367,8 +369,8 @@ class MiniSom(object):
         pc_length, pc = torch.linalg.eig(torch.cov(data.T))
         pc_length, pc = pc_length.real, pc.real
         pc_order = torch.argsort(pc_length, descending=True)
-        for i, c1 in enumerate(torch.linspace(-1, 1, len(self._neigx))):
-            for j, c2 in enumerate(torch.linspace(-1, 1, len(self._neigy))):
+        for i, c1 in enumerate(torch.linspace(-1, 1, len(self._neigx), device=self.device)):
+            for j, c2 in enumerate(torch.linspace(-1, 1, len(self._neigy), device=self.device)):
                 self._weights[i, j] = c1*pc[:, pc_order[0]] + c2*pc[:, pc_order[1]]
 
     def train(self, data, num_iteration,
@@ -405,7 +407,7 @@ class MiniSom(object):
             random_generator = self._random_generator
         iterations = _build_iteration_indexes(len(data), num_iteration,
                                               verbose, random_generator,
-                                              use_epochs)
+                                              use_epochs, device=self.device)
         if use_epochs:
             def get_decay_rate(iteration_index, data_len):
                 return int(iteration_index / data_len)
@@ -417,7 +419,7 @@ class MiniSom(object):
             self.update(data[iteration], self.winner(data[iteration]),
                         decay_rate, num_iteration)
         if verbose:
-            print('\n quantization error:', self.quantization_error(data))
+            print('\n quantization error:', self.quantization_error(data).cpu())
 
     def train_random(self, data, num_iteration, verbose=False):
         """Trains the SOM picking samples at random from data.
@@ -474,7 +476,7 @@ class MiniSom(object):
 
         um = torch.nan * torch.zeros(self._weights.shape[0],
                           self._weights.shape[1],
-                          8)  # 2 spots more for hexagonal topology
+                          8, device=self.device)  # 2 spots more for hexagonal topology
 
         ii = [[0, -1, -1, -1, 0, 1, 1, 1]]*2
         jj = [[-1, -1, 0, 1, 1, 1, 0, -1]]*2
@@ -506,7 +508,7 @@ class MiniSom(object):
             that the neuron i,j have been winner.
         """
         self._check_input_len(data)
-        a = torch.zeros(self._weights.shape[0], self._weights.shape[1])
+        a = torch.zeros(self._weights.shape[0], self._weights.shape[1], device=self.device)
         for x in data:
             a[self.winner(x)] += 1
         return a
@@ -539,7 +541,7 @@ class MiniSom(object):
         If the topographic error is 0, no error occurred.
         If 1, the topology was not preserved for any of the samples."""
         self._check_input_len(data)
-        total_neurons = torch.prod(torch.tensor(self._activation_map.shape))
+        total_neurons = torch.prod(torch.tensor(self._activation_map.shape, device=self.device))
         if total_neurons == 1:
             warn('The topographic error is not defined for a 1-by-1 map.')
             return torch.nan
@@ -554,10 +556,10 @@ class MiniSom(object):
         b2mu_coords = [[self._get_euclidean_coordinates_from_index(bmu[0]),
                         self._get_euclidean_coordinates_from_index(bmu[1])]
                        for bmu in b2mu_inds]
-        b2mu_coords = torch.tensor(b2mu_coords)
+        b2mu_coords = torch.tensor(b2mu_coords, device=self.device)
         b2mu_neighbors = [(bmu1 >= bmu2-1) & ((bmu1 <= bmu2+1))
                           for bmu1, bmu2 in b2mu_coords]
-        b2mu_neighbors = torch.tensor([neighbors.prod() for neighbors in b2mu_neighbors], dtype=torch.float32)
+        b2mu_neighbors = torch.tensor([neighbors.prod() for neighbors in b2mu_neighbors], dtype=torch.float32, device=self.device)
         te = 1 - torch.mean(b2mu_neighbors)
         return te
 
@@ -566,8 +568,8 @@ class MiniSom(object):
         t = 1.42
         # b2mu: best 2 matching units
         b2mu_inds = torch.argsort(self._distance_from_weights(data), dim=1)[:, :2]
-        b2my_xy = unravel_index(b2mu_inds, self._weights.shape[:2])
-        b2mu_x, b2mu_y = torch.tensor(b2my_xy[0], dtype=torch.float32), torch.tensor(b2my_xy[1], dtype=torch.float32)
+        b2my_xy = unravel_index(b2mu_inds.cpu(), self._weights.shape[:2])
+        b2mu_x, b2mu_y = torch.tensor(b2my_xy[0], dtype=torch.float32, device=self.device), torch.tensor(b2my_xy[1], dtype=torch.float32, device=self.device)
         dxdy = torch.hstack([torch.diff(b2mu_x), torch.diff(b2mu_y)])
         distance = torch.linalg.norm(dxdy, axis=1)
         return (distance > t).float().mean()
@@ -590,7 +592,7 @@ class MiniSom(object):
         self._check_input_len(data)
         winmap = defaultdict(list)
         for i, x in enumerate(data):
-            winmap[self.winner(x)].append(torch.tensor(i, dtype=torch.int32) if return_indices else x)
+            winmap[self.winner(x)].append(torch.tensor(i, dtype=torch.int32, device=self.device) if return_indices else x)
         
         for k,v in winmap.items():
             winmap[k] = torch.stack(v, dim=0)
