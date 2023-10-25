@@ -523,6 +523,7 @@ class MiniSom(object):
         self._check_input_len(data)
         a = torch.zeros(self._weights.shape[0], self._weights.shape[1], device=self.device)
         for x in data:
+            x = x.to(self.device)
             a[self.winner(x)] += 1
         return a
 
