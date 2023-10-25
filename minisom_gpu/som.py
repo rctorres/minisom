@@ -6,6 +6,7 @@ from warnings import warn
 from sys import stdout
 from time import time
 from datetime import timedelta
+from .functions import BatchedFunctions
 import torch
 
 """
@@ -75,7 +76,8 @@ class MiniSom(object):
     def __init__(self, x: int, y: int, input_len: int, sigma: float=1.0, learning_rate: float=0.5,
                  decay_function: Callable[[float, int, int], float]=asymptotic_decay,
                  neighborhood_function: str='gaussian', topology: str='rectangular',
-                 activation_distance: str='euclidean', random_seed: int=None, device='cpu'):
+                 activation_distance: str='euclidean', random_seed: int=None, device=torch.device('cpu'),
+                 batch_size: int=32):
         """Initializes a Self Organizing Maps.
 
         A rule of thumb to set the size of the grid for a dimensionality
@@ -144,6 +146,7 @@ class MiniSom(object):
         """
 
         self.device = device
+        self.batch_size = batch_size
         if sigma >= x or sigma >= y:
             warn('Warning: sigma is too high for the dimension of the map.')
 
@@ -366,7 +369,9 @@ class MiniSom(object):
             msg = 'PCA initialization inappropriate:' + \
                   'One of the dimensions of the map is 1.'
             warn(msg)
-        pc_length, pc = torch.linalg.eig(torch.cov(data.T))
+
+        func = BatchedFunctions(data, self.batch_size, self.device)
+        pc_length, pc = torch.linalg.eig(func.cov())
         pc_length, pc = pc_length.real, pc.real
         pc_order = torch.argsort(pc_length, descending=True)
         for i, c1 in enumerate(torch.linspace(-1, 1, len(self._neigx), device=self.device)):
