@@ -408,16 +408,21 @@ class MiniSom(object):
         iterations = _build_iteration_indexes(len(data), num_iteration,
                                               verbose, random_generator,
                                               use_epochs, device=self.device)
+        ds = torch.utils.data.Subset(data, indices=iterations)
+        loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=False)
+
         if use_epochs:
             def get_decay_rate(iteration_index, data_len):
                 return int(iteration_index / data_len)
         else:
             def get_decay_rate(iteration_index, data_len):
                 return int(iteration_index)
-        for t, iteration in enumerate(iterations):
+    
+        for t, x in enumerate(loader):
+            x = x.to(self.device)
             decay_rate = get_decay_rate(t, len(data))
-            self.update(data[iteration], self.winner(data[iteration]),
-                        decay_rate, num_iteration)
+            self.update(x, self.winner(x), decay_rate, num_iteration)
+    
         if verbose:
             print('\n quantization error:', self.quantization_error(data).cpu())
 
