@@ -22,3 +22,12 @@ class TestFunctions:
         assert ret[0] == 4.
         assert ret[1] == 7.
 
+
+    @pytest.mark.parametrize('device', [('cpu'), ('cuda')])
+    def test_cov(self, data, device):
+        obj = BatchedFunctions(data, batch_size=2, device=device)
+        ret = obj.cov()
+        assert ret[0,0] == 13.
+        assert ret[0,1] == -5.
+        assert ret[1,0] == -5.
+        assert ret[1,1] == 4.
