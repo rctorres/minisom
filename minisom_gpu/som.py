@@ -14,7 +14,7 @@ import torch
 """
 
 
-def _build_iteration_indexes(data_len: int, num_iterations: int,
+def _build_iteration_indexes(data: torch.tensor, num_iterations: int,
                              verbose: bool=False, random_generator: torch.Generator=None,
                              use_epochs: bool=False, device='cpu') -> torch.tensor:
     """Returns an iterable with the indexes of the samples
@@ -23,6 +23,8 @@ def _build_iteration_indexes(data_len: int, num_iterations: int,
     If random_generator is not None, it must be an instance
     of numpy.random.RandomState and it will be used
     to randomize the order of the samples."""
+
+    data_len = data.shape[0]
     if use_epochs:
         iterations_per_epoch = torch.randperm(data_len, generator=random_generator, device=device) if random_generator else torch.arange(data_len, device=device)
         iterations = torch.tile(iterations_per_epoch, (1, num_iterations)).flatten()
@@ -31,13 +33,17 @@ def _build_iteration_indexes(data_len: int, num_iterations: int,
         if random_generator:
             shuffle_idx = torch.randperm(iterations.shape[0], generator=random_generator, device=device)
             iterations = iterations[shuffle_idx]
+    
+    ds = torch.utils.data.Subset(data, indices=iterations)
+    loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=False)
+
     if verbose:
-        return _wrap_index__in_verbose(iterations)
+        return _wrap_index__in_verbose(loader)
     else:
-        return iterations
+        return loader
 
 
-def _wrap_index__in_verbose(iterations: torch.tensor) -> None:
+def _wrap_index__in_verbose(iterations):
     """Yields the values in iterations printing the status on the stdout."""
     m = len(iterations)
     digits = len(str(m))
@@ -378,8 +384,7 @@ class MiniSom(object):
             for j, c2 in enumerate(torch.linspace(-1, 1, len(self._neigy), device=self.device)):
                 self._weights[i, j] = c1*pc[:, pc_order[0]] + c2*pc[:, pc_order[1]]
 
-    def train(self, data, num_iteration,
-              random_order=False, verbose=False, use_epochs=False):
+    def train(self, data, num_iteration, random_order=False, verbose=False, use_epochs=False):
         """Trains the SOM.
 
         Parameters
@@ -410,11 +415,9 @@ class MiniSom(object):
         random_generator = None
         if random_order:
             random_generator = self._random_generator
-        iterations = _build_iteration_indexes(len(data), num_iteration,
+        iterations = _build_iteration_indexes(data, num_iteration,
                                               verbose, random_generator,
                                               use_epochs, device=self.device)
-        ds = torch.utils.data.Subset(data, indices=iterations)
-        loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=False)
 
         if use_epochs:
             def get_decay_rate(iteration_index, data_len):
@@ -423,7 +426,7 @@ class MiniSom(object):
             def get_decay_rate(iteration_index, data_len):
                 return int(iteration_index)
     
-        for t, x in enumerate(loader):
+        for t, x in enumerate(iterations):
             x = x.to(self.device)
             decay_rate = get_decay_rate(t, len(data))
             self.update(x, self.winner(x), decay_rate, num_iteration)
@@ -463,7 +466,7 @@ class MiniSom(object):
             If True the status of the training
             will be printed at each time the weights are updated.
         """
-        self.train(data, num_iteration, random_order=False, verbose=verbose)
+        self.train(data=data, num_iteration=num_iteration, random_order=False, verbose=verbose)
 
     def distance_map(self, scaling='sum'):
         """Returns the distance map of the weights.

@@ -205,13 +205,15 @@ class TestMinisom():
         assert q1 > som.quantization_error(data)
 
     def test_use_epochs_variables(self):
-        len_data = 100000
+        len_data = 1000
+        data = torch.arange(len_data).unsqueeze(0)
         num_epochs = 100
         random_gen = torch.Generator()
         random_gen.manual_seed(1)
-        iterations = _build_iteration_indexes(len_data, num_epochs,
+        samples_iterator = _build_iteration_indexes(data, num_epochs,
                                               random_generator=random_gen,
                                               use_epochs=True)
+        iterations = torch.concatenate([v[0] for v in samples_iterator])
         assert num_epochs*len_data == len(iterations)
 
         # checks whether all epochs share the same order of indexes
