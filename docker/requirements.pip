@@ -1,3 +1,4 @@
+
 pylint==2.17.4
 pytest==7.4.0
 ipykernel==6.24.0
@@ -9,5 +10,7 @@ nbformat==5.9.2
 stop_words==2018.7.23
 bokeh==3.2.2
 imageio==2.31.3
+cupy_cuda12x==12.2.0
+XPySom==1.0.7
 build
 twine
